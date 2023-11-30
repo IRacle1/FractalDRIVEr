@@ -13,7 +13,8 @@ uniform float scale;
 uniform vec2 resolution;
 uniform float powing;
 uniform vec2 constant; 
-uniform int isMandelbrot;
+uniform int fractType;
+uniform int functionType;
 
 vec2 ComplexTan(vec2 a) 
 {
@@ -68,12 +69,29 @@ void main()
   vec2 uv = GetCoord(gl_FragCoord.xy, resolution.yy);
   vec2 z = uv;
   vec2 c = constant;
-  if (isMandelbrot == 1) {
+  if (fractType == 0) {
     c += uv;
   }
   int it = 0;
   for (int i = 0; i < maxIterations; i++) {
-    z = ComplexPow(z, powing) + c;
+    switch(functionType) {
+        case 0:
+            z = ComplexPow(z, powing);
+            break;
+        case 1:
+            z = ComplexSin(ComplexPow(z, powing));
+            break;
+        case 2:
+            z = ComplexCos(ComplexPow(z, powing));
+            break;
+        case 3:
+            z = ComplexTan(ComplexPow(z, powing));
+            break;
+        case 4:
+            z = ComplexCtan(ComplexPow(z, powing));
+            break;
+    }
+    z += c;
     if (length(z) >= 2.0f) {
       break;
     }

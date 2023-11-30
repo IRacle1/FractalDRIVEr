@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 
+using FractalDRIVEr.Enums;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
@@ -29,7 +31,8 @@ namespace FractalDRIVEr
         public Vector2 resolution;
         public float Powing { get; set; } = 2f;
         public Vector2 Constant = (0, 0);
-        public bool IsMandelbrot { get; set; } = true;
+        public FractType FractType { get; set; } = FractType.MandelbrotSet;
+        public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
 
         Vector2 mouse;
 
@@ -100,6 +103,8 @@ namespace FractalDRIVEr
                 Constant = (0, 0);
                 MaxIterations = 100;
                 Intensity = 1;
+                FractType = FractType.MandelbrotSet;
+                FunctionType = HelpFunctionType.None;
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
@@ -130,7 +135,17 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.M))
             {
-                IsMandelbrot = !IsMandelbrot;
+                FractType newValue = FractType + 1;
+                if (!Enum.IsDefined(newValue))
+                    newValue = 0;
+                FractType = newValue;
+            }
+            if (KeyboardState.IsKeyPressed(Keys.N))
+            {
+                HelpFunctionType newValue = FunctionType + 1;
+                if (!Enum.IsDefined(newValue))
+                    newValue = 0;
+                FunctionType = newValue;
             }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
@@ -156,7 +171,9 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "intensity"), Intensity);
             GL.Uniform3(GL.GetUniformLocation(shader.Handle, "color"), ref Color);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "isMandelbrot"), IsMandelbrot ? 1 : 0);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
+
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
