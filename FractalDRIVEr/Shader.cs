@@ -81,7 +81,7 @@ namespace FractalDRIVEr
 
         ~Shader()
         {
-            if (disposedValue == false)
+            if (!disposedValue)
             {
                 Console.WriteLine("GPU Resource leak! Did you forget to call Dispose()?");
             }

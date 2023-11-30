@@ -15,9 +15,15 @@ uniform float powing;
 uniform vec2 constant; 
 uniform int isMandelbrot;
 
-vec2 ComplexTan(vec2 a) {return ComplexDiv(ComplexSin(a), ComplexCos(a)); }
-vec2 ComplexCtan(vec2 a) {return ComplexDiv(ComplexCos(a), ComplexSin(a)); }
+vec2 ComplexTan(vec2 a) 
+{
+    return ComplexDiv(ComplexSin(a), ComplexCos(a)); 
+}
 
+vec2 ComplexCtan(vec2 a) 
+{
+    return ComplexDiv(ComplexCos(a), ComplexSin(a)); 
+}
 
 vec2 ComplexPow(vec2 a, float n) {
     float angle = atan(a.y, a.x);

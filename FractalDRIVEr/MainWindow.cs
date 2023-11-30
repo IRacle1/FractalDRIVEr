@@ -47,11 +47,17 @@ namespace FractalDRIVEr
         protected override void OnLoad()
         {
             base.OnLoad();
-            shader = new Shader(@"C:\Users\Sasa2\source\repos\OpenCLTredt\OpenCLTredt\shader.frag", @"C:\Users\Sasa2\source\repos\OpenCLTredt\OpenCLTredt\vertex.vert");
+            shader = new Shader(@"shader.frag", @"vertex.vert");
 
             vao = GL.GenVertexArray();
             GL.BindVertexArray(vao);
             Stopwatch.Start();
+        }
+
+        protected override void OnUnload()
+        {
+            shader.Dispose();
+            base.OnUnload();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
