@@ -15,6 +15,8 @@ uniform float powing;
 uniform vec2 constant; 
 uniform int fractType;
 uniform int functionType;
+uniform float range;
+uniform int coloring;
 
 vec2 ComplexTan(vec2 a) 
 {
@@ -24,6 +26,22 @@ vec2 ComplexTan(vec2 a)
 vec2 ComplexCtan(vec2 a) 
 {
     return ComplexDiv(ComplexCos(a), ComplexSin(a)); 
+}
+
+vec2 ComplexExp(vec2 a) {
+	return exp(a.x) * vec2(cos(a.y), sin(a.y));
+}
+
+vec2 ComplexCosh(vec2 z) {
+	return (ComplexExp(z) + ComplexExp(-z)) / 2.0;
+}
+
+vec2 ComplexSinh(vec2 z) {
+	return (ComplexExp(z) - ComplexExp(-z)) / 2.0;
+}
+
+vec2 ComplexTanh(vec2 z) {
+	return ComplexDiv(ComplexSinh(z), ComplexCosh(z));
 }
 
 vec2 ComplexPow(vec2 a, float n) {
@@ -55,10 +73,10 @@ vec4 GetColorIRacle(int it) {
 }
 
 vec3 GetColorNew(float it) {
-    vec3 a = vec3(0.0, 0.5, 0.5);
-    vec3 b = vec3(0.0, 0.5, 0.5);
-    vec3 c = vec3(0.0, 0.5, 0.33);
-    vec3 d = vec3(0.0, 0.5, 0.66);
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.6, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.1, 0.2);
 
     return a + b * cos(6.28318 * (c * it + d));
 }
@@ -90,9 +108,18 @@ void main()
         case 4:
             z = ComplexCtan(ComplexPow(z, powing));
             break;
+        case 5:
+            z = ComplexSinh(ComplexPow(z, powing));
+            break;
+        case 6:
+            z = ComplexCosh(ComplexPow(z, powing));
+            break;
+        case 7:
+            z = ComplexTanh(ComplexPow(z, powing));
+            break;
     }
     z += c;
-    if (length(z) >= 2.0f) {
+    if (length(z) >= range) {
       break;
     }
     it++;
@@ -102,6 +129,11 @@ void main()
     return;
   }
   else {
-    gl_FragColor = GetColorIRacle(it);
+    if (coloring == 1) {
+        gl_FragColor = vec4(GetColorNew(fract(float(it) / maxIterations) + 0.5), 1);
+    }
+    if (coloring == 0) {
+        gl_FragColor = GetColorIRacle(it);
+    }
   }
 }

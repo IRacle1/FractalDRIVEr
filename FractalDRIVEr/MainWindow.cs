@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Reflection;
 
 using FractalDRIVEr.Enums;
@@ -33,6 +31,8 @@ namespace FractalDRIVEr
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
+        public float Range { get; set; } = 2f;
+        public bool CustomColoring { get; set; } = true;
 
         Vector2 mouse;
 
@@ -95,7 +95,7 @@ namespace FractalDRIVEr
             {
                 Delta += Vector2.UnitX * (Scale * 0.01f) * speedModif;
             }
-            if (KeyboardState.IsKeyDown(Keys.Enter))
+            if (KeyboardState.IsKeyPressed(Keys.Enter))
             {
                 Scale = 2.3f;
                 Delta = (-1.5f, 0.0f);
@@ -105,6 +105,23 @@ namespace FractalDRIVEr
                 Intensity = 1;
                 FractType = FractType.MandelbrotSet;
                 FunctionType = HelpFunctionType.None;
+                Range = 2f;
+            }
+            if (KeyboardState.IsKeyPressed(Keys.Z))
+            {
+                Scale = 2.3f;
+                Delta = (-1.5f, 0.0f);
+            }
+            if (KeyboardState.IsKeyPressed(Keys.X))
+            {
+                Powing = 2f;
+                Constant = (0, 0);
+            }
+            if (KeyboardState.IsKeyPressed(Keys.C))
+            {
+                MaxIterations = 100;
+                Intensity = 1;
+                Range = 2f;
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
@@ -132,6 +149,14 @@ namespace FractalDRIVEr
             if (KeyboardState.IsKeyDown(Keys.KeyPad5))
             {
                 Constant = (0f, 0f);
+            }
+            if (KeyboardState.IsKeyPressed(Keys.KeyPad7) || KeyboardState.IsKeyPressed(Keys.KeyPad9))
+            {
+                Range += (KeyboardState.IsKeyPressed(Keys.KeyPad7) ? -10f : 10f) * speedModif;
+            }
+            if (KeyboardState.IsKeyPressed(Keys.B))
+            {
+                CustomColoring = !CustomColoring;
             }
             if (KeyboardState.IsKeyPressed(Keys.M))
             {
@@ -173,7 +198,8 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
-
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "range"), Range);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), CustomColoring ? 0 : 1);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
