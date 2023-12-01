@@ -41,7 +41,7 @@ namespace FractalDRIVEr
         public BitArray DownedKeys => (BitArray)keysField.GetValue(KeyboardState)!;
 
         public MainWindow(int width, int height, string title) : 
-            base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title, Vsync = VSyncMode.On, WindowState = WindowState.Fullscreen })
+            base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title, Vsync = VSyncMode.On })
         {
             resolution = new Vector2(width, height);
             Singleton = this;
@@ -65,6 +65,7 @@ namespace FractalDRIVEr
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            Title = Extensions.GetName(FractType, FunctionType, Powing, Constant);
             float speedModif = KeyboardState.IsKeyDown(Keys.LeftShift) ? 2f : 1f;
             if (KeyboardState.IsKeyDown(Keys.Q) || KeyboardState.IsKeyDown(Keys.E))
             {
@@ -244,32 +245,6 @@ namespace FractalDRIVEr
         {
             mouse = (e.Position.X, resolution.Y - e.Position.Y);
             base.OnMouseMove(e);
-        }
-
-        private void SaveScreenshot(string filename, int windowWidth, int windowHeight)
-        {
-            var pixels = new byte[windowWidth * windowHeight * 3];
-
-            GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
-            GL.ReadBuffer(ReadBufferMode.Front);
-            GL.ReadPixels(0, 0, windowWidth, windowHeight, PixelFormat.Bgr, PixelType.UnsignedByte, pixels);
-
-            var width = BitConverter.GetBytes((short)windowWidth);
-            var height = BitConverter.GetBytes((short)windowHeight);
-            byte[] header = { 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, width[0], width[1], height[0], height[1], 24, 0b00001000 };
-
-            using MemoryStream ms = new();
-            ms.Write(header, 0, header.Length);
-            ms.Write(pixels, 0, pixels.Length);
-
-            ms.Seek(0, SeekOrigin.Begin);
-
-            using var image = Aspose.Imaging.Image.Load(ms);
-            // Create an instance of PngOptions
-            var exportOptions = new Aspose.Imaging.ImageOptions.PngOptions() { ColorType = Aspose.Imaging.FileFormats.Png.PngColorType.TruecolorWithAlpha };
-
-            // Save tga to png
-            image.Save(Path.Combine(filename) + ".png", exportOptions);
         }
     }
 }
