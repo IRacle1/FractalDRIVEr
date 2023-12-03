@@ -74,11 +74,11 @@ namespace FractalDRIVEr
                 Delta = Lerp(Delta, rawDelta, 0.1f);
                 if (KeyboardState.IsKeyDown(Keys.Q))
                 {
-                    Scale /= 1.01f;
+                    Scale /= 1.0f + (.01f * speedModif);
                 }
                 else
                 {
-                    Scale *= 1.01f;
+                    Scale *= 1.0f + (.01f * speedModif);
                 }
             }
             if (KeyboardState.IsKeyDown(Keys.W))
