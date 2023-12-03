@@ -17,7 +17,6 @@ uniform float powing;
 uniform vec2 constant; 
 uniform int fractType;
 uniform int functionType;
-uniform float range;
 uniform int coloring;
 
 vec2 ComplexTan(vec2 a) 
@@ -71,7 +70,7 @@ vec2 GetCoord(vec2 cord, vec2 res)
   return (delta - (scale / vec2(2.0f, 2.0f))) + cord * (scale / res);
 }
 
-vec4 GetColorIRacle(int it) {
+vec4 GetColorIRacleOld(int it) {
     float newValue = (float(it) / float(maxIterations) * intensity);
 
     vec2 st = gl_FragCoord.xy / resolution.xy;
@@ -86,15 +85,40 @@ vec4 GetColorIRacle(int it) {
     return vec4(newColor, 1.0f);
 }
 
-vec3 GetColorNew(float it) {
+vec4 GetColorIRacleNew(int it) {
+    float newValue = fract(float(it) / maxIterations * intensity) + 0.5;
+
+    vec2 st = gl_FragCoord.xy / resolution.xy;
+
+    vec3 color1 = vec3(219, 244, 255) / 256.0;
+    vec3 color2 = vec3(47, 92, 255) / 256.0;
+    
+    float mixValue = distance(st,vec2(1,0));
+    vec3 colorMod = mix(color1,color2,mixValue);
+
+    vec3 newColor = mix(colorMod, color, 0.5) * newValue;
+    return vec4(newColor, 1.0f);
+}
+
+vec3 GetColorGlobalOld(float it) {
+    float val = fract(float(it) / maxIterations) + 0.5;
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.6, 0.5, 0.5);
     vec3 c = vec3(1.0, 1.0, 1.0);
     vec3 d = vec3(0.0, 0.1, 0.2);
 
-    return a + b * cos(6.28318 * (c * it + d));
+    return a + b * cos(6.28318 * (c * val + d));
 }
 
+vec3 GetColorGlobalNew(float it) {
+    float val = float(it) / maxIterations;
+    vec3 a = vec3(0.5, 0.5, 0.5);
+    vec3 b = vec3(0.6, 0.5, 0.5);
+    vec3 c = vec3(1.0, 1.0, 1.0);
+    vec3 d = vec3(0.0, 0.1, 0.2);
+
+    return a + b * cos(6.28318 * (c * val + d));
+}
 
 void main()
 {
@@ -136,7 +160,7 @@ void main()
             break;
     }
     z += c;
-    if (length(z) >= range) {
+    if (length(z) >= 2.0f) {
       break;
     }
     it++;
@@ -146,11 +170,17 @@ void main()
     return;
   }
   else {
-    if (coloring == 1) {
-        gl_FragColor = vec4(GetColorNew(fract(float(it) / maxIterations) + 0.5), 1);
-    }
     if (coloring == 0) {
-        gl_FragColor = GetColorIRacle(it);
+        gl_FragColor = GetColorIRacleOld(it);
+    }
+    if (coloring == 1) {
+        gl_FragColor = vec4(GetColorGlobalOld(it), 1);
+    }
+    if (coloring == 2) {
+        gl_FragColor = GetColorIRacleNew(it);
+    }
+    if (coloring == 3) {
+        gl_FragColor = vec4(GetColorGlobalNew(it), 1);
     }
   }
 }

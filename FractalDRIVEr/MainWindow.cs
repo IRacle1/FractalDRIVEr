@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 using FractalDRIVEr.Enums;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -31,8 +33,7 @@ namespace FractalDRIVEr
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
-        public float Range { get; set; } = 2f;
-        public bool CustomColoring { get; set; } = true;
+        public ColoringType ColoringType { get; set; } = ColoringType.IRacleOld;
 
         Vector2 mouse;
 
@@ -40,7 +41,7 @@ namespace FractalDRIVEr
 
         public BitArray DownedKeys => (BitArray)keysField.GetValue(KeyboardState)!;
 
-        public MainWindow(int width, int height, string title) : 
+        public MainWindow(int width, int height, string title) :
             base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title, Vsync = VSyncMode.On })
         {
             resolution = new Vector2(width, height);
@@ -66,7 +67,7 @@ namespace FractalDRIVEr
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             Title = Extensions.GetName(FractType, FunctionType, Powing, Constant);
-            float speedModif = KeyboardState.IsKeyDown(Keys.LeftShift) ? 2f : 1f;
+            float speedModif = KeyboardState.IsKeyDown(Keys.LeftControl) ? 0.2f : (KeyboardState.IsKeyDown(Keys.LeftShift) ? 2f : 1f);
             if (KeyboardState.IsKeyDown(Keys.Q) || KeyboardState.IsKeyDown(Keys.E))
             {
                 Vector2 rawDelta = Delta - new Vector2(Scale / 2) + mouse * (Scale / resolution.Y);
@@ -106,7 +107,6 @@ namespace FractalDRIVEr
                 Intensity = 1;
                 FractType = FractType.MandelbrotSet;
                 FunctionType = HelpFunctionType.None;
-                Range = 2f;
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
@@ -122,7 +122,6 @@ namespace FractalDRIVEr
             {
                 MaxIterations = 100;
                 Intensity = 1;
-                Range = 2f;
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
@@ -151,30 +150,22 @@ namespace FractalDRIVEr
             {
                 Constant = (0f, 0f);
             }
-            if (KeyboardState.IsKeyPressed(Keys.KeyPad7) || KeyboardState.IsKeyPressed(Keys.KeyPad9))
-            {
-                Range += (KeyboardState.IsKeyPressed(Keys.KeyPad7) ? -10f : 10f) * speedModif;
-            }
             if (KeyboardState.IsKeyPressed(Keys.B))
             {
-                CustomColoring = !CustomColoring;
+                ColoringType newValue = ColoringType + 1;
+                if (!Enum.IsDefined(newValue))
+                    newValue = 0;
+                ColoringType = newValue;
+            }
+            if (KeyboardState.IsKeyPressed(Keys.N))
+            {
+                int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
+                FunctionType = EditEnum(FunctionType, val);
             }
             if (KeyboardState.IsKeyPressed(Keys.M))
             {
-                if (KeyboardState.IsKeyDown(Keys.LeftShift))
-                {
-                    HelpFunctionType newValue = FunctionType + 1;
-                    if (!Enum.IsDefined(newValue))
-                        newValue = 0;
-                    FunctionType = newValue;
-                }
-                else
-                {
-                    FractType newValue = FractType + 1;
-                    if (!Enum.IsDefined(newValue))
-                        newValue = 0;
-                    FractType = newValue;
-                }
+                int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
+                FractType = EditEnum(FractType, val);
             }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
@@ -202,8 +193,7 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "range"), Range);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), CustomColoring ? 0 : 1);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -248,6 +238,20 @@ namespace FractalDRIVEr
         {
             mouse = (e.Position.X, resolution.Y - e.Position.Y);
             base.OnMouseMove(e);
+        }
+
+        private T EditEnum<T>(T value, int addTo)
+            where T : struct, Enum
+        {
+            var arr = Enum.GetValues<T>();
+
+            int index = Array.FindIndex(arr, e => e.Equals(value));
+            int newIndex = (index + addTo) % arr.Length;
+            if (newIndex < 0)
+            {
+                return arr[arr.Length + newIndex];
+            }
+            return arr[newIndex];
         }
     }
 }
