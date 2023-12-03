@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <IsPublishable>False</IsPublishable>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoWin32Manifest>true</NoWin32Manifest>
+    <ApplicationIcon>patrick-bateman-heterochromatic-eyes-sticker.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="patrick-bateman-heterochromatic-eyes-sticker.ico" />
     <Content Include="shader.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
