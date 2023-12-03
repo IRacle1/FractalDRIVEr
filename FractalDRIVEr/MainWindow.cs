@@ -161,17 +161,20 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.M))
             {
-                FractType newValue = FractType + 1;
-                if (!Enum.IsDefined(newValue))
-                    newValue = 0;
-                FractType = newValue;
-            }
-            if (KeyboardState.IsKeyPressed(Keys.N))
-            {
-                HelpFunctionType newValue = FunctionType + 1;
-                if (!Enum.IsDefined(newValue))
-                    newValue = 0;
-                FunctionType = newValue;
+                if (KeyboardState.IsKeyDown(Keys.LeftShift))
+                {
+                    HelpFunctionType newValue = FunctionType + 1;
+                    if (!Enum.IsDefined(newValue))
+                        newValue = 0;
+                    FunctionType = newValue;
+                }
+                else
+                {
+                    FractType newValue = FractType + 1;
+                    if (!Enum.IsDefined(newValue))
+                        newValue = 0;
+                    FractType = newValue;
+                }
             }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
