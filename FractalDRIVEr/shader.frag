@@ -5,6 +5,8 @@
 #define ComplexSin(a) vec2(sin(a.x) * cosh(a.y), cos(a.x) * sinh(a.y))
 #define ComplexCos(a) vec2(cos(a.x) * cosh(a.y), -sin(a.x) * sinh(a.y))
 
+#define PI 3.1415926535897932384626433832795
+
 uniform int maxIterations;
 uniform vec3 color;
 uniform float intensity;
@@ -28,6 +30,14 @@ vec2 ComplexCtan(vec2 a)
     return ComplexDiv(ComplexCos(a), ComplexSin(a)); 
 }
 
+vec2 ComplexLog(vec2 a) {
+    float rpart = sqrt((a.x*a.x)+(a.y*a.y));
+    float ipart = atan(a.y,a.x);
+    if (ipart > PI) 
+        ipart = ipart - (2.0 * PI);
+    return vec2(log(rpart),ipart);
+}
+
 vec2 ComplexExp(vec2 a) {
 	return exp(a.x) * vec2(cos(a.y), sin(a.y));
 }
@@ -42,6 +52,10 @@ vec2 ComplexSinh(vec2 z) {
 
 vec2 ComplexTanh(vec2 z) {
 	return ComplexDiv(ComplexSinh(z), ComplexCosh(z));
+}
+
+vec2 ComplexCtanh(vec2 z) {
+    return ComplexDiv(ComplexCosh(z), ComplexSinh(z));
 }
 
 vec2 ComplexPow(vec2 a, float n) {
@@ -116,6 +130,9 @@ void main()
             break;
         case 7:
             z = ComplexTanh(ComplexPow(z, powing));
+            break;
+        case 8:
+            z = ComplexCtanh(ComplexPow(z, powing));
             break;
     }
     z += c;

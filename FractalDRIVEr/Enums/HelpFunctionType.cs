@@ -10,5 +10,6 @@
         Sinh,
         Cosh,
         Tanh,
+        Ctanh,
     }
 }

@@ -27,7 +27,7 @@ namespace FractalDRIVEr
             string vecString = string.Empty;
             if (c != Vector2.Zero)
             {
-                vecString = $"{MathF.Round(c.X, 2)} + {MathF.Round(c.Y, 2)}i";
+                vecString = $" + {MathF.Round(c.X, 2)} + {MathF.Round(c.Y, 2)}i";
             }
 
             return string.Format(raw, vecString, MathF.Round(powing, 2));
