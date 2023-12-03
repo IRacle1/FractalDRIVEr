@@ -1,4 +1,4 @@
-﻿#version 420 core
+﻿#version 330 core
 
 #define ComplexMul(a, b) vec2(a.x*b.x-a.y*b.y, a.x*b.y+a.y*b.x)
 #define ComplexDiv(a, b) vec2(((a.x*b.x+a.y*b.y)/(b.x*b.x+b.y*b.y)),((a.y*b.x-a.x*b.y)/(b.x*b.x+b.y*b.y)))
@@ -101,7 +101,7 @@ vec4 GetColorIRacleNew(int it) {
 }
 
 vec3 GetColorGlobalOld(float it) {
-    float val = fract(float(it) / maxIterations) + 0.5;
+    float val = fract(float(it) / maxIterations * intensity) + 0.5;
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.6, 0.5, 0.5);
     vec3 c = vec3(1.0, 1.0, 1.0);
@@ -111,7 +111,7 @@ vec3 GetColorGlobalOld(float it) {
 }
 
 vec3 GetColorGlobalNew(float it) {
-    float val = float(it) / maxIterations;
+    float val = float(it) / maxIterations * intensity;
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.6, 0.5, 0.5);
     vec3 c = vec3(1.0, 1.0, 1.0);
