@@ -34,6 +34,7 @@ namespace FractalDRIVEr
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
         public ColoringType ColoringType { get; set; } = ColoringType.IRacleOld;
+        public int SuperSampling { get; set; } = 1;
 
         Vector2 mouse;
 
@@ -146,6 +147,10 @@ namespace FractalDRIVEr
             {
                 Constant += (0f, (KeyboardState.IsKeyDown(Keys.KeyPad2) ? -0.006f : 0.006f) * speedModif);
             }
+            if (KeyboardState.IsKeyPressed(Keys.KeyPad7) || KeyboardState.IsKeyPressed(Keys.KeyPad9))
+            {
+                SuperSampling += KeyboardState.IsKeyPressed(Keys.KeyPad7) ? -1 : 1;
+            }
             if (KeyboardState.IsKeyDown(Keys.KeyPad5))
             {
                 Constant = (0f, 0f);
@@ -194,6 +199,7 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "superSampling"), SuperSampling);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
