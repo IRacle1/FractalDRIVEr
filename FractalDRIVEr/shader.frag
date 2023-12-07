@@ -19,6 +19,7 @@ uniform int fractType;
 uniform int functionType;
 uniform int coloring;
 bool smoothIterations = true;
+float barier = 4.0f;
 
 vec2 ComplexTan(vec2 a) 
 {
@@ -71,7 +72,7 @@ vec2 GetCoord(vec2 cord, vec2 res)
   return (delta - (scale / vec2(2.0f, 2.0f))) + cord * (scale / res);
 }
 
-vec4 GetColorIRacle(int it, bool isNew) {
+vec4 GetColorIRacle(float it, bool isNew) {
     float newValue = float(it) / float(maxIterations) * intensity;
     if (isNew) {
         newValue = fract(newValue + 0.5);
@@ -145,7 +146,7 @@ void main()
             break;
     }
     z += c;
-    if (dot(z, z) > 4.0f) {
+    if (dot(z, z) > barier * barier) {
       break;
     }
     it++;
@@ -155,11 +156,15 @@ void main()
     return;
   }
   else {
+    float newIt = float(it);
+    if (smoothIterations) {
+        newIt = it - log(log(dot(z, z)) / log(barier)) / log(2.);
+    }
     if (coloring % 2 == 0) {
-        gl_FragColor = GetColorIRacle(it, (coloring >> 1) % 2 != 0);
+        gl_FragColor = GetColorIRacle(newIt, (coloring >> 1) % 2 != 0);
     }
     else {
-        gl_FragColor = vec4(GetColorGlobal(it, (coloring >> 1) % 2 != 0), 1);
+        gl_FragColor = vec4(GetColorGlobal(newIt, (coloring >> 1) % 2 != 0), 1);
     }
   }
 }
