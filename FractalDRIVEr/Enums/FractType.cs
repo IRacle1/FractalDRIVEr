@@ -4,5 +4,6 @@
     {
         MandelbrotSet,
         JuilaSet,
+        BurningShip
     }
 }

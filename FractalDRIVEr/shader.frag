@@ -18,6 +18,7 @@ uniform vec2 constant;
 uniform int fractType;
 uniform int functionType;
 uniform int coloring;
+bool smoothIterations = true;
 
 vec2 ComplexTan(vec2 a) 
 {
@@ -70,8 +71,11 @@ vec2 GetCoord(vec2 cord, vec2 res)
   return (delta - (scale / vec2(2.0f, 2.0f))) + cord * (scale / res);
 }
 
-vec4 GetColorIRacleOld(int it) {
-    float newValue = (float(it) / float(maxIterations) * intensity);
+vec4 GetColorIRacle(int it, bool isNew) {
+    float newValue = float(it) / float(maxIterations) * intensity;
+    if (isNew) {
+        newValue = fract(newValue + 0.5);
+    }
 
     vec2 st = gl_FragCoord.xy / resolution.xy;
 
@@ -85,33 +89,11 @@ vec4 GetColorIRacleOld(int it) {
     return vec4(newColor, 1.0f);
 }
 
-vec4 GetColorIRacleNew(int it) {
-    float newValue = fract(float(it) / maxIterations * intensity) + 0.5;
-
-    vec2 st = gl_FragCoord.xy / resolution.xy;
-
-    vec3 color1 = vec3(219, 244, 255) / 256.0;
-    vec3 color2 = vec3(47, 92, 255) / 256.0;
-    
-    float mixValue = distance(st,vec2(1,0));
-    vec3 colorMod = mix(color1,color2,mixValue);
-
-    vec3 newColor = mix(colorMod, color, 0.5) * newValue;
-    return vec4(newColor, 1.0f);
-}
-
-vec3 GetColorGlobalOld(float it) {
-    float val = fract(float(it) / maxIterations * intensity) + 0.5;
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.6, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.0, 0.1, 0.2);
-
-    return a + b * cos(6.28318 * (c * val + d));
-}
-
-vec3 GetColorGlobalNew(float it) {
+vec3 GetColorGlobal(float it, bool isNew) {
     float val = float(it) / maxIterations * intensity;
+    if (!isNew) {
+        val = fract(val + 0.5);
+    }
     vec3 a = vec3(0.5, 0.5, 0.5);
     vec3 b = vec3(0.6, 0.5, 0.5);
     vec3 c = vec3(1.0, 1.0, 1.0);
@@ -125,11 +107,14 @@ void main()
   vec2 uv = GetCoord(gl_FragCoord.xy, resolution.yy);
   vec2 z = uv;
   vec2 c = constant;
-  if (fractType == 0) {
+  if (fractType != 1) {
     c += uv;
   }
   int it = 0;
   for (int i = 0; i < maxIterations; i++) {
+    if (fractType == 2) {
+        z = vec2(abs(z.x), abs(z.y));
+    }
     switch(functionType) {
         case 0:
             z = ComplexPow(z, powing);
@@ -160,7 +145,7 @@ void main()
             break;
     }
     z += c;
-    if (length(z) >= 2.0f) {
+    if (dot(z, z) > 4.0f) {
       break;
     }
     it++;
@@ -170,17 +155,11 @@ void main()
     return;
   }
   else {
-    if (coloring == 0) {
-        gl_FragColor = GetColorIRacleOld(it);
+    if (coloring % 2 == 0) {
+        gl_FragColor = GetColorIRacle(it, (coloring >> 1) % 2 != 0);
     }
-    if (coloring == 1) {
-        gl_FragColor = vec4(GetColorGlobalOld(it), 1);
-    }
-    if (coloring == 2) {
-        gl_FragColor = GetColorIRacleNew(it);
-    }
-    if (coloring == 3) {
-        gl_FragColor = vec4(GetColorGlobalNew(it), 1);
+    else {
+        gl_FragColor = vec4(GetColorGlobal(it, (coloring >> 1) % 2 != 0), 1);
     }
   }
 }
