@@ -19,7 +19,7 @@ uniform int fractType;
 uniform int functionType;
 uniform int coloring;
 bool smoothIterations = true;
-float barier = 4.0f;
+float barier = 256.0f;
 uniform int superSampling;
 
 float random (in vec2 st) {
@@ -87,7 +87,7 @@ vec2 GetCoord(vec2 cord, vec2 res)
 
 vec2 GetCoordRand(vec2 cord, vec2 res)
 {
-    return (delta - (scale / vec2(2.0f, 2.0f))) + cord * (scale / res) + random2() * (scale / res);
+    return (delta - (scale / vec2(2.0f, 2.0f))) + (cord + random2()) * (scale / res);
 }
 
 vec4 GetColorIRacle(float it, bool isNew) {
@@ -169,7 +169,7 @@ vec4 mainCalculate(vec2 uv) {
       it++;
     }
     if (it >= maxIterations) {
-      return vec4(0.0f, 0.0f, 0.0f, 1.0f);
+      return vec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
     else {
       float newIt = float(it);
@@ -196,7 +196,12 @@ void main()
   for(int i = 0; i < superSampling; i++) 
   {
       vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
-      col += mainCalculate(uv).xyz;
+      vec4 temp = mainCalculate(uv);
+      //if (temp.w == 0.0f) {
+      //  gl_FragColor = temp;
+      //  return;
+      //}
+      col += temp.xyz;
   }
   gl_FragColor = vec4(col / superSampling, 1.0f);
 }

@@ -108,6 +108,7 @@ namespace FractalDRIVEr
                 Intensity = 1;
                 FractType = FractType.MandelbrotSet;
                 FunctionType = HelpFunctionType.None;
+                SuperSampling = 1;
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
