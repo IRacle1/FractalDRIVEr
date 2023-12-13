@@ -18,9 +18,9 @@ uniform vec2 constant;
 uniform int fractType;
 uniform int functionType;
 uniform int coloring;
-bool smoothIterations = true;
-float barier = 256.0;
-uniform int superSampling;
+uniform int smoothMode;
+uniform float barier;
+
 
 float random(in vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.989, 78.233))) * 43758.543);
@@ -170,7 +170,7 @@ vec4 mainCalculate(vec2 uv) {
                 break;
         }
         z += c;
-        if(dot(z, z) > barier * barier) {
+        if(barier > 0 ? dot(z, z) > barier * barier : dot(z, z) < barier * barier) {
             break;
         }
         it++;
@@ -179,7 +179,7 @@ vec4 mainCalculate(vec2 uv) {
         return vec4(0.0, 0.0, 0.0, 0.0);
     } else {
         float newIt = float(it);
-        if(smoothIterations) {
+        if(smoothMode == 1) {
             newIt = it - log(log(dot(z, z)) / log(barier)) / log(2.);
         }
 
@@ -202,20 +202,16 @@ vec4 mainCalculate(vec2 uv) {
 }
 
 void main() {
-    if(superSampling == 1) {
+    if(smoothMode == 0) {
         gl_FragColor = mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy));
         return;
     }
 
     vec3 col = vec3(0.0);
-    for(int i = 0; i < superSampling; i++) {
+    for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
         vec4 temp = mainCalculate(uv);
-      //if (temp.w == 0.0f) {
-      //  gl_FragColor = temp;
-      //  return;
-      //}
         col += temp.xyz;
     }
-    gl_FragColor = vec4(col / superSampling, 1.0);
+    gl_FragColor = vec4(col / 4, 1.0);
 }

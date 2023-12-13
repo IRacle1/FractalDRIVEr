@@ -1,14 +1,12 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 using FractalDRIVEr.Enums;
 
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -34,7 +32,8 @@ namespace FractalDRIVEr
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
         public ColoringType ColoringType { get; set; } = ColoringType.Default;
-        public int SuperSampling { get; set; } = 1;
+        public bool SmoothMode { get; set; } = false;
+        public float Barier { get; set; } = 4.0f;
 
         Vector2 mouse;
 
@@ -108,7 +107,8 @@ namespace FractalDRIVEr
                 Intensity = 1;
                 FractType = FractType.MandelbrotSet;
                 FunctionType = HelpFunctionType.None;
-                SuperSampling = 1;
+                SmoothMode = false;
+                Barier = 4.0f;
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
@@ -148,13 +148,17 @@ namespace FractalDRIVEr
             {
                 Constant += (0f, (KeyboardState.IsKeyDown(Keys.KeyPad2) ? -0.006f : 0.006f) * speedModif);
             }
-            if (KeyboardState.IsKeyPressed(Keys.KeyPad7) || KeyboardState.IsKeyPressed(Keys.KeyPad9))
+            if (KeyboardState.IsKeyDown(Keys.KeyPad7) || KeyboardState.IsKeyDown(Keys.KeyPad9))
             {
-                SuperSampling += KeyboardState.IsKeyPressed(Keys.KeyPad7) ? -1 : 1;
+                Barier += (KeyboardState.IsKeyDown(Keys.KeyPad7) ? -0.2f : 0.2f) * speedModif;
             }
             if (KeyboardState.IsKeyDown(Keys.KeyPad5))
             {
                 Constant = (0f, 0f);
+            }
+            if (KeyboardState.IsKeyPressed(Keys.V))
+            {
+                SmoothMode = !SmoothMode;
             }
             if (KeyboardState.IsKeyPressed(Keys.B))
             {
@@ -198,7 +202,9 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "superSampling"), SuperSampling);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "smoothMode"), SmoothMode ? 1 : 0);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "barier"), Barier);
+
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
