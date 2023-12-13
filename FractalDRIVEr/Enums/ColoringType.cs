@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FractalDRIVEr.Enums;
+﻿namespace FractalDRIVEr.Enums;
 
 public enum ColoringType
 {
-    IRacleOld,
+    Default,
+    StableOld,
     GlobalOld,
-    IRacleNew,
+    IRacleOld,
+    IRacleNew
 }

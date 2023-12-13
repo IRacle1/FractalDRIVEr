@@ -33,7 +33,7 @@ namespace FractalDRIVEr
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
-        public ColoringType ColoringType { get; set; } = ColoringType.IRacleOld;
+        public ColoringType ColoringType { get; set; } = ColoringType.Default;
         public int SuperSampling { get; set; } = 1;
 
         Vector2 mouse;
@@ -158,10 +158,8 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.B))
             {
-                ColoringType newValue = ColoringType + 1;
-                if (!Enum.IsDefined(newValue))
-                    newValue = 0;
-                ColoringType = newValue;
+                int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
+                ColoringType = EditEnum(ColoringType, val);
             }
             if (KeyboardState.IsKeyPressed(Keys.N))
             {
