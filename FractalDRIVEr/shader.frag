@@ -42,7 +42,7 @@ vec2 ComplexCtan(vec2 a) {
 }
 
 vec2 ComplexLog(vec2 a) {
-    float rpart = sqrt((a.x * a.x) + (a.y * a.y));
+    float rpart = length(a);
     float ipart = atan(a.y, a.x);
     if(ipart > PI)
         ipart = ipart - (2.0 * PI);
@@ -72,10 +72,25 @@ vec2 ComplexCtanh(vec2 z) {
 vec2 ComplexPow(vec2 a, float n) {
     float angle = atan(a.y, a.x);
     float r = length(a);
-    float value = pow(r, n);
-    float real = value * cos(n * angle);
-    float im = value * sin(n * angle);
-    return vec2(real, im);
+    float newAngle = n * angle;
+    float newR = pow(r, n);
+    return newR * vec2(cos(newAngle), sin(newAngle));
+}
+
+vec2 ComplexPowI(vec2 a, float n) {
+    float angle = atan(a.y, a.x);
+    float r = length(a);
+    float newAngle = n * log(r);
+    float newR = exp(-n* angle);
+    return newR * vec2(cos(newAngle), sin(newAngle));
+}
+
+vec2 ComplexPowFull(vec2 a, vec2 b) {
+    float angle = atan(a.y, a.x);
+    float r = length(a);
+    float newAngle = b.x * angle + b.y * log(r);
+    float newR = pow(r, b.x) * exp(-b.y * angle);
+    return newR * vec2(cos(newAngle), sin(newAngle));
 }
 
 vec2 GetCoord(vec2 cord, vec2 res) {
