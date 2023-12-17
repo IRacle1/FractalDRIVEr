@@ -13,7 +13,7 @@ uniform float intensity;
 uniform vec2 delta;
 uniform float scale;
 uniform vec2 resolution;
-uniform float powing;
+uniform vec2 powing;
 uniform vec2 constant;
 uniform int fractType;
 uniform int functionType;
@@ -155,33 +155,31 @@ vec4 mainCalculate(vec2 uv) {
         if(fractType == 2) {
             z = abs(z);
         }
+        z = ComplexPowFull(z, powing);
         switch(functionType) {
-            case 0:
-                z = ComplexPow(z, powing);
-                break;
             case 1:
-                z = ComplexSin(ComplexPow(z, powing));
+                z = ComplexSin(z);
                 break;
             case 2:
-                z = ComplexCos(ComplexPow(z, powing));
+                z = ComplexCos(z);
                 break;
             case 3:
-                z = ComplexTan(ComplexPow(z, powing));
+                z = ComplexTan(z);
                 break;
             case 4:
-                z = ComplexCtan(ComplexPow(z, powing));
+                z = ComplexCtan(z);
                 break;
             case 5:
-                z = ComplexSinh(ComplexPow(z, powing));
+                z = ComplexSinh(z);
                 break;
             case 6:
-                z = ComplexCosh(ComplexPow(z, powing));
+                z = ComplexCosh(z);
                 break;
             case 7:
-                z = ComplexTanh(ComplexPow(z, powing));
+                z = ComplexTanh(z);
                 break;
             case 8:
-                z = ComplexCtanh(ComplexPow(z, powing));
+                z = ComplexCtanh(z);
                 break;
         }
         z += c;
