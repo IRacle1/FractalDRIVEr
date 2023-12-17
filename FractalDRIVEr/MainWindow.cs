@@ -27,7 +27,7 @@ namespace FractalDRIVEr
         public Vector2 Delta = new(-1.5f, 0f);
         public Vector3 Color = new(1, 1, 1);
         public Vector2 resolution;
-        public float Powing { get; set; } = 2f;
+        public Vector2 Powing = new(2f, 0f);
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
@@ -66,7 +66,7 @@ namespace FractalDRIVEr
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            Title = Extensions.GetName(FractType, FunctionType, Powing, Constant);
+            //Title = Extensions.GetName(FractType, FunctionType, Powing, Constant);
             float speedModif = KeyboardState.IsKeyDown(Keys.LeftControl) ? 0.2f : (KeyboardState.IsKeyDown(Keys.LeftShift) ? 2f : 1f);
             if (KeyboardState.IsKeyDown(Keys.Q) || KeyboardState.IsKeyDown(Keys.E))
             {
@@ -101,7 +101,7 @@ namespace FractalDRIVEr
             {
                 Scale = 2.3f;
                 Delta = (-1.5f, 0.0f);
-                Powing = 2f;
+                Powing = (2f, 0f);
                 Constant = (0, 0);
                 MaxIterations = 100;
                 Intensity = 1;
@@ -117,7 +117,7 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.X))
             {
-                Powing = 2f;
+                Powing = new(2f, 0f);
                 Constant = (0, 0);
             }
             if (KeyboardState.IsKeyPressed(Keys.C))
@@ -127,17 +127,21 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
-                Powing += (KeyboardState.IsKeyDown(Keys.Left) ? -0.01f : 0.01f) * speedModif;
+                Powing += new Vector2((KeyboardState.IsKeyDown(Keys.Left) ? -0.01f : 0.01f) * speedModif, 0f);
             }
-            if (KeyboardState.IsKeyPressed(Keys.Up) || KeyboardState.IsKeyPressed(Keys.Down))
+            if (KeyboardState.IsKeyDown(Keys.Up) || KeyboardState.IsKeyDown(Keys.Down))
+            {
+                Powing += new Vector2(0f, (KeyboardState.IsKeyDown(Keys.Down) ? -0.01f : 0.01f) * speedModif);
+            }
+            if (KeyboardState.IsKeyPressed(Keys.KeyPad1) || KeyboardState.IsKeyPressed(Keys.KeyPad7))
             {
                 if (KeyboardState.IsKeyDown(Keys.LeftShift))
                 {
-                    Intensity += KeyboardState.IsKeyPressed(Keys.Down) ? -1 : 1;
+                    Intensity += KeyboardState.IsKeyPressed(Keys.KeyPad1) ? -1 : 1;
                 }
                 else
                 {
-                    MaxIterations += KeyboardState.IsKeyPressed(Keys.Down) ? -10 : 10;
+                    MaxIterations += KeyboardState.IsKeyPressed(Keys.KeyPad1) ? -10 : 10;
                 }
             }
             if (KeyboardState.IsKeyDown(Keys.KeyPad4) || KeyboardState.IsKeyDown(Keys.KeyPad6))
@@ -148,9 +152,9 @@ namespace FractalDRIVEr
             {
                 Constant += (0f, (KeyboardState.IsKeyDown(Keys.KeyPad2) ? -0.006f : 0.006f) * speedModif);
             }
-            if (KeyboardState.IsKeyDown(Keys.KeyPad7) || KeyboardState.IsKeyDown(Keys.KeyPad9))
+            if (KeyboardState.IsKeyDown(Keys.KeyPad3) || KeyboardState.IsKeyDown(Keys.KeyPad9))
             {
-                Barier += (KeyboardState.IsKeyDown(Keys.KeyPad7) ? -0.2f : 0.2f) * speedModif;
+                Barier += (KeyboardState.IsKeyDown(Keys.KeyPad3) ? -0.2f : 0.2f) * speedModif;
             }
             if (KeyboardState.IsKeyDown(Keys.KeyPad5))
             {
@@ -198,7 +202,7 @@ namespace FractalDRIVEr
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, "constant"), ref Constant);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "intensity"), Intensity);
             GL.Uniform3(GL.GetUniformLocation(shader.Handle, "color"), ref Color);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
+            GL.Uniform2(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
