@@ -15,6 +15,7 @@ uniform float scale;
 uniform vec2 resolution;
 uniform vec2 powing;
 uniform vec2 constant;
+uniform int constantFlags;
 uniform int fractType;
 uniform int functionType;
 uniform int coloring;
@@ -183,7 +184,14 @@ vec4 mainCalculate(vec2 uv) {
             case 9:
                 z = ComplexPowFull(powing, z);
         }
-        z += c;
+        switch (constantFlags) {
+            case 0:
+                z += c;
+                break;
+            case 1:
+                z = ComplexPowFull(z, c);
+                break;
+        }
         if(barier > 0 ? dot(z, z) > barier * barier : dot(z, z) < barier * barier) {
             break;
         }

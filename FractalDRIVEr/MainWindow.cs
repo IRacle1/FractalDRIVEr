@@ -21,16 +21,18 @@ namespace FractalDRIVEr
 
         int vao;
 
+        public Vector2 resolution;
+        public Vector3 color = new(1, 1, 1);
+
         public float Intensity { get; set; } = 1f;
         public int MaxIterations { get; set; } = 100;
         public float Scale { get; set; } = 2.3f;
         public Vector2 Delta = new(-1.5f, 0f);
-        public Vector3 Color = new(1, 1, 1);
-        public Vector2 resolution;
         public Vector2 Powing = new(2f, 0f);
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
+        public ConstantFlags ConstantFlags { get; set; } = ConstantFlags.Plus;
         public ColoringType ColoringType { get; set; } = ColoringType.Default;
         public bool SmoothMode { get; set; } = false;
         public float Barier { get; set; } = 4.0f;
@@ -113,6 +115,7 @@ namespace FractalDRIVEr
                 FunctionType = HelpFunctionType.None;
                 SmoothMode = false;
                 Barier = 4.0f;
+                ConstantFlags = ConstantFlags.Plus;
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
@@ -130,6 +133,7 @@ namespace FractalDRIVEr
                 Intensity = 1;
                 ColoringType = ColoringType.Default;
                 SmoothMode = false;
+                Barier = 4.0f;
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
@@ -185,14 +189,19 @@ namespace FractalDRIVEr
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
                 FractType = EditEnum(FractType, val);
             }
+            if (KeyboardState.IsKeyPressed(Keys.R))
+            {
+                int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
+                ConstantFlags = EditEnum(ConstantFlags, val);
+            }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
             }
 
-            Color.X = (float)Math.Abs(Math.Sin(Stopwatch.Elapsed.TotalSeconds));
-            Color.Y = (float)Math.Abs(Math.Cos(Stopwatch.Elapsed.TotalSeconds));
-            Color.Z = (float)Math.Abs(Math.Sin(Stopwatch.Elapsed.TotalSeconds + 0.25));
+            color.X = (float)Math.Abs(Math.Sin(Stopwatch.Elapsed.TotalSeconds));
+            color.Y = (float)Math.Abs(Math.Cos(Stopwatch.Elapsed.TotalSeconds));
+            color.Z = (float)Math.Abs(Math.Sin(Stopwatch.Elapsed.TotalSeconds + 0.25));
 
             UpdateUniforms();
 
@@ -207,13 +216,14 @@ namespace FractalDRIVEr
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, "delta"), ref Delta);
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, "constant"), ref Constant);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "intensity"), Intensity);
-            GL.Uniform3(GL.GetUniformLocation(shader.Handle, "color"), ref Color);
+            GL.Uniform3(GL.GetUniformLocation(shader.Handle, "color"), ref color);
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, "powing"), Powing);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "fractType"), (int)FractType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "functionType"), (int)FunctionType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "smoothMode"), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "barier"), Barier);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "constantFlags"), (int)ConstantFlags);
 
         }
 
@@ -273,6 +283,55 @@ namespace FractalDRIVEr
                 return arr[arr.Length + newIndex];
             }
             return arr[newIndex];
+        }
+
+        private FractInfo ToFractalInfo(bool keepPosition = false, bool keepColor = false)
+        {
+            var value = new FractInfo
+            {
+                FractType = FractType,
+                Barier = Barier,
+                Constant = Constant,
+                ConstantFlags = ConstantFlags,
+                FunctionType = FunctionType,
+                Powing = Powing
+            };
+
+            if (keepPosition)
+            {
+                value.PositionInfo = new PositionInfo
+                {
+                    Delta = Delta,
+                    Scale = Scale,
+                };
+            }
+            if (keepColor)
+            {
+                value.ColorInfo = new ColorInfo
+                {
+                    ColoringType = ColoringType,
+                    Intensity = Intensity,
+                    MaxIterations = MaxIterations,
+                    SmoothMode = SmoothMode,
+                };
+            }
+
+            return value;
+        }
+
+        private void FromFractalInfo(FractInfo info)
+        {
+            Scale = info.PositionInfo.Scale;
+            Delta = info.PositionInfo.Delta;
+            Powing = info.Powing;
+            Constant = info.Constant;
+            MaxIterations = info.ColorInfo.MaxIterations;
+            Intensity = info.ColorInfo.Intensity;
+            FractType = info.FractType;
+            FunctionType = info.FunctionType;
+            SmoothMode = info.ColorInfo.SmoothMode;
+            Barier = info.Barier;
+            ConstantFlags = info.ConstantFlags;
         }
     }
 }
