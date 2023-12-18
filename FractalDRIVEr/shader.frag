@@ -21,7 +21,6 @@ uniform int coloring;
 uniform int smoothMode;
 uniform float barier;
 
-
 float random(in vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.989, 78.233))) * 43758.543);
 }
@@ -181,6 +180,8 @@ vec4 mainCalculate(vec2 uv) {
             case 8:
                 z = ComplexCtanh(z);
                 break;
+            case 9:
+                z = ComplexPowFull(powing, z);
         }
         z += c;
         if(barier > 0 ? dot(z, z) > barier * barier : dot(z, z) < barier * barier) {

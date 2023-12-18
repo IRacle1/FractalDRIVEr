@@ -81,6 +81,10 @@ namespace FractalDRIVEr
                     Scale *= 1.0f + (.01f * speedModif);
                 }
             }
+            if (KeyboardState.IsKeyDown(Keys.L)) 
+            {
+                Constant = Delta - new Vector2(Scale / 2) + mouse * (Scale / resolution.Y);
+            }
             if (KeyboardState.IsKeyDown(Keys.W))
             {
                 Delta += Vector2.UnitY * (Scale * 0.01f) * speedModif;
