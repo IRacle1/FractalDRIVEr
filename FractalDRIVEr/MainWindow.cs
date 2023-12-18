@@ -128,6 +128,8 @@ namespace FractalDRIVEr
             {
                 MaxIterations = 100;
                 Intensity = 1;
+                ColoringType = ColoringType.Default;
+                SmoothMode = false;
             }
             if (KeyboardState.IsKeyDown(Keys.Left) || KeyboardState.IsKeyDown(Keys.Right))
             {
