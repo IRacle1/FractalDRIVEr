@@ -13,7 +13,7 @@ namespace FractalDRIVEr
     public class FractInfo
     {
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
-        public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
+        public FunctionType FunctionType { get; set; } = FunctionType.None;
         public ConstantFlags ConstantFlags { get; set; } = ConstantFlags.Plus;
         public Vector2Serializable Powing { get; set; } = new(2f, 0f);
         public Vector2Serializable Constant { get; set; } = new(0, 0);

@@ -31,7 +31,7 @@ namespace FractalDRIVEr
         public Vector2 Powing = new(2f, 0f);
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
-        public HelpFunctionType FunctionType { get; set; } = HelpFunctionType.None;
+        public FunctionType FunctionType { get; set; } = FunctionType.None;
         public ConstantFlags ConstantFlags { get; set; } = ConstantFlags.Plus;
         public ColoringType ColoringType { get; set; } = ColoringType.Default;
         public bool SmoothMode { get; set; } = false;
@@ -112,7 +112,7 @@ namespace FractalDRIVEr
                 MaxIterations = 100;
                 Intensity = 1;
                 FractType = FractType.MandelbrotSet;
-                FunctionType = HelpFunctionType.None;
+                FunctionType = FunctionType.None;
                 SmoothMode = false;
                 Barier = 4.0f;
                 ConstantFlags = ConstantFlags.Plus;

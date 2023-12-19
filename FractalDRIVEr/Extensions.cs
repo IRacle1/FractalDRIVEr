@@ -12,14 +12,14 @@ namespace FractalDRIVEr
 {
     public static class Extensions
     {
-        public static string GetName(FractType fractType, HelpFunctionType functionType, float powing, Vector2 c)
+        public static string GetName(FractType fractType, FunctionType functionType, float powing, Vector2 c)
         {
             string raw = "((z)^{1}){0}";
             if (fractType == FractType.MandelbrotSet)
             {
                 raw += " + c";
             }
-            if (functionType != HelpFunctionType.None)
+            if (functionType != FunctionType.None)
             {
                 raw = functionType.ToString() + raw;
             }

@@ -1,6 +1,6 @@
 ﻿namespace FractalDRIVEr.Enums
 {
-    public enum HelpFunctionType
+    public enum FunctionType
     {
         None,
         Sin,
