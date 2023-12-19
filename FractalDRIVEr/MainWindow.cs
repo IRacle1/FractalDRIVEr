@@ -285,7 +285,7 @@ namespace FractalDRIVEr
             return arr[newIndex];
         }
 
-        private FractInfo ToFractalInfo(bool keepPosition = false, bool keepColor = false)
+        public FractInfo ToFractalInfo(bool keepPosition = false, bool keepColor = false)
         {
             var value = new FractInfo
             {
@@ -319,7 +319,7 @@ namespace FractalDRIVEr
             return value;
         }
 
-        private void FromFractalInfo(FractInfo info)
+        public void FromFractalInfo(FractInfo info)
         {
             Scale = info.PositionInfo.Scale;
             Delta = info.PositionInfo.Delta;
