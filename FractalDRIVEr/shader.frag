@@ -155,34 +155,36 @@ vec4 mainCalculate(vec2 uv) {
         if(fractType == 2) {
             z = abs(z);
         }
-        z = ComplexPowFull(z, powing);
         switch(functionType) {
+            case 0:
+                z = ComplexPowFull(z, powing);
+                break;
             case 1:
-                z = ComplexSin(z);
+                z = ComplexSin(ComplexPowFull(z, powing));
                 break;
             case 2:
-                z = ComplexCos(z);
+                z = ComplexCos(ComplexPowFull(z, powing));
                 break;
             case 3:
-                z = ComplexTan(z);
+                z = ComplexTan(ComplexPowFull(z, powing));
                 break;
             case 4:
-                z = ComplexCtan(z);
+                z = ComplexCtan(ComplexPowFull(z, powing));
                 break;
             case 5:
-                z = ComplexSinh(z);
+                z = ComplexSinh(ComplexPowFull(z, powing));
                 break;
             case 6:
-                z = ComplexCosh(z);
+                z = ComplexCosh(ComplexPowFull(z, powing));
                 break;
             case 7:
-                z = ComplexTanh(z);
+                z = ComplexTanh(ComplexPowFull(z, powing));
                 break;
             case 8:
-                z = ComplexCtanh(z);
+                z = ComplexCtanh(ComplexPowFull(z, powing));
                 break;
             case 9:
-                z = ComplexPowFull(powing, z);
+                z = ComplexPowFull(powing, ComplexPowFull(z, powing));
         }
         switch (constantFlags) {
             case 0:
