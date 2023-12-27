@@ -22,6 +22,24 @@ uniform int coloring;
 uniform int smoothMode;
 uniform float barier;
 
+mat4x3 color1 = mat4x3(
+    vec3(0.5, 0.5, 0.5), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
+
+mat4x3 color2 = mat4x3(
+    vec3(0.5, 0.5, 0.5), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(2.0, 1.0, 0.0),
+    vec3(0.5, 0.2, 0.25));
+
+mat4x3 color3 = mat4x3(
+    vec3(0.000, 0.500, 0.500), 
+    vec3(0.000, 0.500, 0.500),
+    vec3(0.000, 0.500, 0.333),
+    vec3(0.000, 0.500, 0.667));
+
 float random(in vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.989, 78.233))) * 43758.543);
 }
@@ -41,7 +59,7 @@ vec2 ComplexCtan(vec2 a) {
     return ComplexDiv(ComplexCos(a), ComplexSin(a));
 }
 
-vec2 ComplexLog(vec2 a) {
+vec2 ComplexLn(vec2 a) {
     float rpart = length(a);
     float ipart = atan(a.y, a.x);
     if(ipart > PI)
@@ -81,7 +99,7 @@ vec2 ComplexPowI(vec2 a, float n) {
     float angle = atan(a.y, a.x);
     float r = length(a);
     float newAngle = n * log(r);
-    float newR = exp(-n* angle);
+    float newR = exp(-n * angle);
     return newR * vec2(cos(newAngle), sin(newAngle));
 }
 
@@ -131,17 +149,13 @@ vec4 GetColorIRacle(float it, bool isNew) {
     return vec4(newColor, 1.0);
 }
 
-vec4 GetColorGlobal(float it, bool isNew) {
+vec4 GetColorGlobal(float it, mat4x3 pattern, bool isNew) {
     float val = float(it) / maxIterations * intensity;
     if(!isNew) {
         val = fract(val + 0.5);
     }
-    vec3 a = vec3(0.5, 0.5, 0.5);
-    vec3 b = vec3(0.6, 0.5, 0.5);
-    vec3 c = vec3(1.0, 1.0, 1.0);
-    vec3 d = vec3(0.0, 0.1, 0.2);
 
-    return vec4(a + b * cos(6.28318 * (c * val + d)), 1.0);
+    return vec4(pattern[0] + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
 }
 
 vec4 mainCalculate(vec2 uv) {
@@ -193,6 +207,9 @@ vec4 mainCalculate(vec2 uv) {
             case 1:
                 z = ComplexPowFull(z, c);
                 break;
+            case 2:
+                z = ComplexPowFull(c, z);
+                break;
         }
         if(barier > 0 ? dot(z, z) > barier * barier : dot(z, z) < barier * barier) {
             break;
@@ -211,16 +228,16 @@ vec4 mainCalculate(vec2 uv) {
             return GetStableColor(vec3(1.0), newIt, false);
         }
         if(coloring == 1) {
-            return GetStableColor(color, newIt, false);
+            return GetColorGlobal(newIt, color1, false);
         }
         if(coloring == 2) {
-            return GetColorGlobal(newIt, false);
+            return GetColorGlobal(newIt, color2, false);
         }
         if(coloring == 3) {
-            return GetColorIRacle(newIt, false);
+            return GetColorGlobal(newIt, color3, true);
         }
         if(coloring == 4) {
-            return GetColorIRacle(newIt, true);
+            return GetColorIRacle(newIt, false);
         }
     }
 }

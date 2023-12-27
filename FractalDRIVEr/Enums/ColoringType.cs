@@ -3,8 +3,8 @@
 public enum ColoringType
 {
     Default,
-    StableOld,
-    GlobalOld,
+    Global1,
+    Global2,
+    Global3,
     IRacleOld,
-    IRacleNew
 }
