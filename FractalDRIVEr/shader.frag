@@ -22,6 +22,8 @@ uniform int coloring;
 uniform int smoothMode;
 uniform float barier;
 
+out vec4 FragColor;
+
 mat4x3 color1 = mat4x3(
     vec3(0.5, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
@@ -244,7 +246,7 @@ vec4 mainCalculate(vec2 uv) {
 
 void main() {
     if(smoothMode == 0) {
-        gl_FragColor = mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy));
+        FragColor = mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy));
         return;
     }
 
@@ -254,5 +256,5 @@ void main() {
         vec4 temp = mainCalculate(uv);
         col += temp.xyz;
     }
-    gl_FragColor = vec4(col / 4, 1.0);
+    FragColor = vec4(col / 4, 1.0);
 }
