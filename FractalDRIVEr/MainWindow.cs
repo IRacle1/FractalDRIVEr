@@ -68,7 +68,10 @@ namespace FractalDRIVEr
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            //Title = Extensions.GetName(FractType, FunctionType, Powing, Constant);
+            if (KeyboardState.IsKeyPressed(Keys.F11))
+            {
+                WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
+            }
             float speedModif = KeyboardState.IsKeyDown(Keys.LeftControl) ? 0.2f : (KeyboardState.IsKeyDown(Keys.LeftShift) ? 2f : 1f);
             if (KeyboardState.IsKeyDown(Keys.Q) || KeyboardState.IsKeyDown(Keys.E))
             {
@@ -83,7 +86,7 @@ namespace FractalDRIVEr
                     Scale *= 1.0f + (.01f * speedModif);
                 }
             }
-            if (KeyboardState.IsKeyDown(Keys.L)) 
+            if (KeyboardState.IsKeyDown(Keys.L))
             {
                 Constant = Delta - new Vector2(Scale / 2) + mouse * (Scale / resolution.Y);
             }
@@ -125,7 +128,6 @@ namespace FractalDRIVEr
             if (KeyboardState.IsKeyPressed(Keys.X))
             {
                 Powing = new(2f, 0f);
-                Constant = (0, 0);
             }
             if (KeyboardState.IsKeyPressed(Keys.C))
             {
@@ -271,7 +273,7 @@ namespace FractalDRIVEr
             base.OnMouseMove(e);
         }
 
-        private T EditEnum<T>(T value, int addTo)
+        private static T EditEnum<T>(T value, int addTo)
             where T : struct, Enum
         {
             var arr = Enum.GetValues<T>();
@@ -283,55 +285,6 @@ namespace FractalDRIVEr
                 return arr[arr.Length + newIndex];
             }
             return arr[newIndex];
-        }
-
-        public FractInfo ToFractalInfo(bool keepPosition = false, bool keepColor = false)
-        {
-            var value = new FractInfo
-            {
-                FractType = FractType,
-                Barier = Barier,
-                Constant = Constant,
-                ConstantFlags = ConstantFlags,
-                FunctionType = FunctionType,
-                Powing = Powing
-            };
-
-            if (keepPosition)
-            {
-                value.PositionInfo = new PositionInfo
-                {
-                    Delta = Delta,
-                    Scale = Scale,
-                };
-            }
-            if (keepColor)
-            {
-                value.ColorInfo = new ColorInfo
-                {
-                    ColoringType = ColoringType,
-                    Intensity = Intensity,
-                    MaxIterations = MaxIterations,
-                    SmoothMode = SmoothMode,
-                };
-            }
-
-            return value;
-        }
-
-        public void FromFractalInfo(FractInfo info)
-        {
-            Scale = info.PositionInfo.Scale;
-            Delta = info.PositionInfo.Delta;
-            Powing = info.Powing;
-            Constant = info.Constant;
-            MaxIterations = info.ColorInfo.MaxIterations;
-            Intensity = info.ColorInfo.Intensity;
-            FractType = info.FractType;
-            FunctionType = info.FunctionType;
-            SmoothMode = info.ColorInfo.SmoothMode;
-            Barier = info.Barier;
-            ConstantFlags = info.ConstantFlags;
         }
     }
 }
