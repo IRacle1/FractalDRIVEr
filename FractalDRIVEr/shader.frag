@@ -15,7 +15,7 @@ uniform float scale;
 uniform vec2 resolution;
 uniform vec2 powing;
 uniform vec2 constant;
-uniform int constantFlags;
+uniform int constantFlag;
 uniform int fractType;
 uniform int functionType;
 uniform int coloring;
@@ -202,7 +202,7 @@ vec4 mainCalculate(vec2 uv) {
             case 9:
                 z = ComplexPowFull(powing, ComplexPowFull(z, powing));
         }
-        switch (constantFlags) {
+        switch (constantFlag) {
             case 0:
                 z += c;
                 break;

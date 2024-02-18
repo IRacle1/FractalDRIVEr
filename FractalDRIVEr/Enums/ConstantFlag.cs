@@ -1,6 +1,6 @@
 ﻿namespace FractalDRIVEr.Enums;
 
-public enum ConstantFlags
+public enum ConstantFlag
 {
     Plus,
     Pow,

@@ -32,7 +32,7 @@ namespace FractalDRIVEr
         public Vector2 Constant = (0, 0);
         public FractType FractType { get; set; } = FractType.MandelbrotSet;
         public FunctionType FunctionType { get; set; } = FunctionType.None;
-        public ConstantFlags ConstantFlags { get; set; } = ConstantFlags.Plus;
+        public ConstantFlag ConstantFlag { get; set; } = ConstantFlag.Plus;
         public ColoringType ColoringType { get; set; } = ColoringType.Default;
         public bool SmoothMode { get; set; } = false;
         public float Barier { get; set; } = 4.0f;
@@ -118,7 +118,7 @@ namespace FractalDRIVEr
                 FunctionType = FunctionType.None;
                 SmoothMode = false;
                 Barier = 4.0f;
-                ConstantFlags = ConstantFlags.Plus;
+                ConstantFlag = ConstantFlag.Plus;
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
@@ -194,7 +194,7 @@ namespace FractalDRIVEr
             if (KeyboardState.IsKeyPressed(Keys.R))
             {
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
-                ConstantFlags = EditEnum(ConstantFlags, val);
+                ConstantFlag = EditEnum(ConstantFlag, val);
             }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
@@ -225,7 +225,7 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "coloring"), (int)ColoringType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "smoothMode"), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, "barier"), Barier);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "constantFlags"), (int)ConstantFlags);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, "constantFlag"), (int)ConstantFlag);
 
         }
 
