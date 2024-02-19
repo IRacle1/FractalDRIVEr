@@ -286,5 +286,54 @@ namespace FractalDRIVEr
             }
             return arr[newIndex];
         }
+
+        public FractInfo ToFractalInfo(bool keepPosition = false, bool keepColor = false)
+        {
+            var value = new FractInfo
+            {
+                FractType = FractType,
+                Barier = Barier,
+                Constant = Constant,
+                ConstantFlags = ConstantFlags,
+                FunctionType = FunctionType,
+                Powing = Powing
+            };
+
+            if (keepPosition)
+            {
+                value.PositionInfo = new PositionInfo
+                {
+                    Delta = Delta,
+                    Scale = Scale,
+                };
+            }
+            if (keepColor)
+            {
+                value.ColorInfo = new ColorInfo
+                {
+                    ColoringType = ColoringType,
+                    Intensity = Intensity,
+                    MaxIterations = MaxIterations,
+                    SmoothMode = SmoothMode,
+                };
+            }
+
+            return value;
+        }
+
+        public void FromFractalInfo(FractInfo info)
+        {
+            Scale = info.PositionInfo.Scale;
+            Delta = info.PositionInfo.Delta;
+            Powing = info.Powing;
+            Constant = info.Constant;
+            MaxIterations = info.ColorInfo.MaxIterations;
+            Intensity = info.ColorInfo.Intensity;
+            FractType = info.FractType;
+            FunctionType = info.FunctionType;
+            SmoothMode = info.ColorInfo.SmoothMode;
+            Barier = info.Barier;
+            ConstantFlags = info.ConstantFlags;
+        }
     }
 }
