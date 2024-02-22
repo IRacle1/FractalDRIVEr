@@ -14,13 +14,19 @@ uniform float Scale;
 uniform vec2 resolution;
 uniform vec2 Pow;
 uniform vec2 Constant;
-uniform int ConstantFlag;
-uniform int FractType;
-uniform int MainFunctionType;
-uniform int BeforeFunctionType;
 uniform int ColoringType;
 uniform int SmoothMode;
 uniform float Barier;
+
+// 0 - FractType
+// 1 - MainFunctionType
+// 2 - BeforeFunctionType
+// 3 - ConstantFlag
+
+uniform int[4] OldBehaviour;
+uniform int[4] Behaviour;
+
+uniform float PeriodPersent;
 
 out vec4 FragColor;
 
@@ -159,18 +165,18 @@ vec2 DoFunction(int num, vec2 z) {
     return ret;
 }
 
-vec4 mainCalculate(vec2 uv) {
+int mainCalculate(vec2 uv, int[4] behaviour) {
     vec2 z = uv;
     vec2 c = Constant;
-    if(FractType != 1) {
+    if(behaviour[0] != 1) {
         c += uv;
     }
     int it = 0;
     for(int i = 0; i < MaxIterations; i++) {
-        z = DoFunction(BeforeFunctionType, z);
-        z = DoFunction(MainFunctionType, ComplexPowFull(z, Pow));
+        z = DoFunction(behaviour[2], z);
+        z = DoFunction(behaviour[1], ComplexPowFull(z, Pow));
         
-        switch (ConstantFlag) {
+        switch (behaviour[3]) {
             case 0:
                 z += c;
                 break;
@@ -188,14 +194,75 @@ vec4 mainCalculate(vec2 uv) {
 
         it++;
     }
+
+    return it;
+}
+
+int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float coef) {
+    vec2 z = uv;
+    vec2 c = Constant;
+
+    if (behaviourOne[0] == 0 && behaviourTwo[0] == 0) {
+        c += uv;
+    }
+    else if (behaviourOne[0] == 0 && behaviourTwo[0] == 1) {
+        c += uv * (1 - coef);
+    }
+    else if (behaviourOne[0] == 1 && behaviourTwo[0] == 0) {
+        c += uv * coef;
+    }
+
+    int it = 0;
+    for(int i = 0; i < MaxIterations; i++) {
+        z = mix(DoFunction(behaviourOne[2], z), DoFunction(behaviourTwo[2], z), coef);
+        z = ComplexPowFull(z, Pow);
+        z = mix(DoFunction(behaviourOne[1], z), DoFunction(behaviourTwo[1], z), coef);
+        
+        vec2 first = z;
+        vec2 second = z;
+
+        switch (behaviourOne[3]) {
+            case 0:
+                first += c;
+                break;
+            case 1:
+                first = ComplexPowFull(first, c);
+                break;
+            case 2:
+                first = ComplexPowFull(c, first);
+                break;
+        }
+
+        switch (behaviourTwo[3]) {
+            case 0:
+                second += c;
+                break;
+            case 1:
+                second = ComplexPowFull(second, c);
+                break;
+            case 2:
+                second = ComplexPowFull(c, second);
+                break;
+        }
+        
+        z = mix(first, second, coef);
+
+        if(Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier) {
+            break;
+        }
+
+        it++;
+    }
+
+    return it;
+}
+
+vec4 PostCalculate(int it) {
     if(it >= MaxIterations) {
         return vec4(0.0, 0.0, 0.0, 0.0);
     } 
     else {
         float newIt = float(it);
-        if(SmoothMode == 1) {
-            newIt = it - log(log(dot(z, z)) / log(Barier)) / log(2.);
-        }
 
         if(ColoringType == 0) {
             return GetStableColor(vec3(1.0), newIt, false);
@@ -214,14 +281,19 @@ vec4 mainCalculate(vec2 uv) {
 
 void main() {
     if(SmoothMode == 0) {
-        FragColor = mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy));
+        if (PeriodPersent == 0.0f) {
+            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour));
+        }
+        else {
+            FragColor = PostCalculate(SmartCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, OldBehaviour, PeriodPersent));
+        }
         return;
     }
 
     vec3 col = vec3(0.0);
     for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
-        vec4 temp = mainCalculate(uv);
+        vec4 temp = PostCalculate(mainCalculate(uv, Behaviour));
         if (temp == vec4(0.0)) {
             FragColor = vec4(temp.xyz, 1.0);
             return;

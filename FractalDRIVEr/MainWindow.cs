@@ -34,10 +34,71 @@ namespace FractalDRIVEr
         public Vector2 Pow = (2f, 0f);
         public Vector2 Constant = (0, 0);
 
-        public FractType FractType { get; set; } = FractType.MandelbrotSet;
-        public FunctionType MainFunctionType { get; set; } = FunctionType.None;
-        public FunctionType BeforeFunctionType { get; set; } = FunctionType.None;
-        public ConstantFlag ConstantFlag { get; set; } = ConstantFlag.Plus;
+        public FractType FractType 
+        { 
+            get
+            {
+                return (FractType)Behaviour[0];
+            }
+            set
+            {
+                Behaviour[0] = (int)value;
+            }
+        }
+
+        public FunctionType MainFunctionType
+        {
+            get
+            {
+                return (FunctionType)Behaviour[01];
+            }
+            set
+            {
+                Behaviour[1] = (int)value;
+            }
+        }
+
+        public FunctionType BeforeFunctionType
+        {
+            get
+            {
+                return (FunctionType)Behaviour[2];
+            }
+            set
+            {
+                Behaviour[2] = (int)value;
+            }
+        }
+
+        public ConstantFlag ConstantFlag
+        {
+            get
+            {
+                return (ConstantFlag)Behaviour[3];
+            }
+            set
+            {
+                Behaviour[3] = (int)value;
+            }
+        }
+
+        private int[] OldBehaviour = new int[4]
+        {
+            (int)FractType.MandelbrotSet,
+            (int)FunctionType.None,
+            (int)FunctionType.None,
+            (int)ConstantFlag.Plus,
+        };
+
+        private int[] Behaviour = new int[4]
+        {
+            (int)FractType.MandelbrotSet,
+            (int)FunctionType.None,
+            (int)FunctionType.None,
+            (int)ConstantFlag.Plus,
+        };
+
+        private float PeriodPersent { get; set; } = 0f;
 
         public float Barier { get; set; } = 4.0f;
 
@@ -111,7 +172,7 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyDown(Keys.D))
             {
-                Delta += Vector2.UnitX  * (Scale * 0.01f) * speedModif;
+                Delta += Vector2.UnitX * (Scale * 0.01f) * speedModif;
             }
             if (KeyboardState.IsKeyPressed(Keys.Enter))
             {
@@ -147,23 +208,23 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyDown(Keys.Left))
             {
-                Pow += -Vector2.UnitX * (Scale * 0.01f) * speedModif;
+                Pow += -Vector2.UnitX * 0.01f * speedModif;
             }
             if (KeyboardState.IsKeyDown(Keys.Right))
             {
-                Pow += Vector2.UnitX * (Scale * 0.01f) * speedModif;
+                Pow += Vector2.UnitX * 0.01f * speedModif;
             }
             if (KeyboardState.IsKeyDown(Keys.Up))
             {
-                Pow += Vector2.UnitY * (Scale * 0.01f) * speedModif;
+                Pow += Vector2.UnitY * 0.01f * speedModif;
             }
             if (KeyboardState.IsKeyDown(Keys.Down))
             {
-                Pow += -Vector2.UnitY * (Scale * 0.01f) * speedModif;
+                Pow += -Vector2.UnitY * 0.01f * speedModif;
             }
             if (KeyboardState.IsKeyPressed(Keys.KeyPad1) || KeyboardState.IsKeyPressed(Keys.KeyPad7))
             {
-                if (KeyboardState.IsKeyPressed(Keys.LeftShift))
+                if (KeyboardState.IsKeyDown(Keys.LeftShift))
                 {
                     Intensity += KeyboardState.IsKeyPressed(Keys.KeyPad1) ? -1 : 1;
                 }
@@ -212,6 +273,22 @@ namespace FractalDRIVEr
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
                 FractType = FractType.EditEnum(val);
             }
+            if (KeyboardState.IsKeyPressed(Keys.Period))
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    OldBehaviour[i] = Behaviour[i];
+                    Console.WriteLine(OldBehaviour[i]);
+                }
+            }
+            if (KeyboardState.IsKeyDown(Keys.KeyPadAdd))
+            {
+                PeriodPersent = MathF.Min(1.0f, PeriodPersent + 0.05f * speedModif);
+            }
+            if (KeyboardState.IsKeyDown(Keys.KeyPadSubtract))
+            {
+                PeriodPersent = MathF.Max(0.0f, PeriodPersent - 0.05f * speedModif);
+            }
             if (KeyboardState.IsKeyPressed(Keys.R))
             {
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
@@ -236,13 +313,12 @@ namespace FractalDRIVEr
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(Constant)), ref Constant);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Intensity)), Intensity);
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(Pow)), Pow);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(FractType)), (int)FractType);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(MainFunctionType)), (int)MainFunctionType);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(BeforeFunctionType)), (int)BeforeFunctionType);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Behaviour)), Behaviour.Length, Behaviour);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(OldBehaviour)), OldBehaviour.Length, OldBehaviour);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(ColoringType)), (int)ColoringType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(SmoothMode)), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Barier)), Barier);
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(ConstantFlag)), (int)ConstantFlag);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(PeriodPersent)), PeriodPersent);
 
         }
 
