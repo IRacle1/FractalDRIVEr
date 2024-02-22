@@ -319,7 +319,6 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(SmoothMode)), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Barier)), Barier);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(PeriodPersent)), PeriodPersent);
-
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
