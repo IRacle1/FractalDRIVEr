@@ -7,20 +7,20 @@
 
 #define PI 3.1415926535897932384626433832795
 
-uniform int maxIterations;
-uniform vec3 color;
-uniform float intensity;
-uniform vec2 delta;
-uniform float scale;
+uniform int MaxIterations;
+uniform float Intensity;
+uniform vec2 Delta;
+uniform float Scale;
 uniform vec2 resolution;
-uniform vec2 powing;
-uniform vec2 constant;
-uniform int constantFlag;
-uniform int fractType;
-uniform int functionType;
-uniform int coloring;
-uniform int smoothMode;
-uniform float barier;
+uniform vec2 Pow;
+uniform vec2 Constant;
+uniform int ConstantFlag;
+uniform int FractType;
+uniform int MainFunctionType;
+uniform int BeforeFunctionType;
+uniform int ColoringType;
+uniform int SmoothMode;
+uniform float Barier;
 
 out vec4 FragColor;
 
@@ -89,22 +89,6 @@ vec2 ComplexCtanh(vec2 z) {
     return ComplexDiv(ComplexCosh(z), ComplexSinh(z));
 }
 
-vec2 ComplexPow(vec2 a, float n) {
-    float angle = atan(a.y, a.x);
-    float r = length(a);
-    float newAngle = n * angle;
-    float newR = pow(r, n);
-    return newR * vec2(cos(newAngle), sin(newAngle));
-}
-
-vec2 ComplexPowI(vec2 a, float n) {
-    float angle = atan(a.y, a.x);
-    float r = length(a);
-    float newAngle = n * log(r);
-    float newR = exp(-n * angle);
-    return newR * vec2(cos(newAngle), sin(newAngle));
-}
-
 vec2 ComplexPowFull(vec2 a, vec2 b) {
     float angle = atan(a.y, a.x);
     float r = length(a);
@@ -114,15 +98,15 @@ vec2 ComplexPowFull(vec2 a, vec2 b) {
 }
 
 vec2 GetCoord(vec2 cord, vec2 res) {
-    return (delta - (scale / vec2(2.0, 2.0))) + cord * (scale / res);
+    return (Delta - (Scale / vec2(2.0, 2.0))) + cord * (Scale / res);
 }
 
 vec2 GetCoordRand(vec2 cord, vec2 res) {
-    return (delta - (scale / vec2(2.0, 2.0))) + (cord + random2()) * (scale / res);
+    return (Delta - (Scale / vec2(2.0, 2.0))) + (cord + random2()) * (Scale / res);
 }
 
 vec4 GetStableColor(vec3 color, float it, bool isNew) {
-    float newValue = float(it) / float(maxIterations) * intensity;
+    float newValue = float(it) / float(MaxIterations) * Intensity;
 
     if(isNew) {
         newValue = fract(newValue + 0.5);
@@ -132,27 +116,8 @@ vec4 GetStableColor(vec3 color, float it, bool isNew) {
     return vec4(newColor, 1.0);
 }
 
-vec4 GetColorIRacle(float it, bool isNew) {
-    float newValue = float(it) / float(maxIterations) * intensity;
-
-    if(isNew) {
-        newValue = fract(newValue + 0.5);
-    }
-
-    vec2 st = gl_FragCoord.xy / resolution.xy;
-
-    vec3 color1 = vec3(219, 244, 255) / 256.0;
-    vec3 color2 = vec3(47, 92, 255) / 256.0;
-
-    float mixValue = distance(st, vec2(1, 0));
-    vec3 colorMod = mix(color1, color2, mixValue);
-
-    vec3 newColor = mix(colorMod, color, 0.5) * newValue;
-    return vec4(newColor, 1.0);
-}
-
 vec4 GetColorGlobal(float it, mat4x3 pattern, bool isNew) {
-    float val = float(it) / maxIterations * intensity;
+    float val = float(it) / MaxIterations * Intensity;
     if(!isNew) {
         val = fract(val + 0.5);
     }
@@ -160,49 +125,52 @@ vec4 GetColorGlobal(float it, mat4x3 pattern, bool isNew) {
     return vec4(pattern[0] + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
 }
 
+vec2 DoFunction(int num, vec2 z) {
+    vec2 ret = z;
+    switch(num) {
+        case 1:
+            ret = ComplexSin(z);
+            break;
+        case 2:
+            ret = ComplexCos(z);
+            break;
+        case 3:
+            ret = ComplexTan(z);
+            break;
+        case 4:
+            ret = ComplexCtan(z);
+            break;
+        case 5:
+            ret = ComplexSinh(z);
+            break;
+        case 6:
+            ret = ComplexCosh(z);
+            break;
+        case 7:
+            ret = ComplexTanh(z);
+            break;
+        case 8:
+            ret = ComplexCtanh(z);
+            break;
+        case 9:
+            ret = abs(z);
+    }
+
+    return ret;
+}
+
 vec4 mainCalculate(vec2 uv) {
     vec2 z = uv;
-    vec2 c = constant;
-    if(fractType != 1) {
+    vec2 c = Constant;
+    if(FractType != 1) {
         c += uv;
     }
     int it = 0;
-    for(int i = 0; i < maxIterations; i++) {
-        if(fractType == 2) {
-            z = abs(z);
-        }
-        switch(functionType) {
-            case 0:
-                z = ComplexPowFull(z, powing);
-                break;
-            case 1:
-                z = ComplexSin(ComplexPowFull(z, powing));
-                break;
-            case 2:
-                z = ComplexCos(ComplexPowFull(z, powing));
-                break;
-            case 3:
-                z = ComplexTan(ComplexPowFull(z, powing));
-                break;
-            case 4:
-                z = ComplexCtan(ComplexPowFull(z, powing));
-                break;
-            case 5:
-                z = ComplexSinh(ComplexPowFull(z, powing));
-                break;
-            case 6:
-                z = ComplexCosh(ComplexPowFull(z, powing));
-                break;
-            case 7:
-                z = ComplexTanh(ComplexPowFull(z, powing));
-                break;
-            case 8:
-                z = ComplexCtanh(ComplexPowFull(z, powing));
-                break;
-            case 9:
-                z = ComplexPowFull(powing, ComplexPowFull(z, powing));
-        }
-        switch (constantFlag) {
+    for(int i = 0; i < MaxIterations; i++) {
+        z = DoFunction(BeforeFunctionType, z);
+        z = DoFunction(MainFunctionType, ComplexPowFull(z, Pow));
+        
+        switch (ConstantFlag) {
             case 0:
                 z += c;
                 break;
@@ -213,39 +181,39 @@ vec4 mainCalculate(vec2 uv) {
                 z = ComplexPowFull(c, z);
                 break;
         }
-        if(barier > 0 ? dot(z, z) > barier * barier : dot(z, z) < barier * barier) {
+
+        if(Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier) {
             break;
         }
+
         it++;
     }
-    if(it >= maxIterations) {
+    if(it >= MaxIterations) {
         return vec4(0.0, 0.0, 0.0, 0.0);
-    } else {
+    } 
+    else {
         float newIt = float(it);
-        if(smoothMode == 1) {
-            newIt = it - log(log(dot(z, z)) / log(barier)) / log(2.);
+        if(SmoothMode == 1) {
+            newIt = it - log(log(dot(z, z)) / log(Barier)) / log(2.);
         }
 
-        if(coloring == 0) {
+        if(ColoringType == 0) {
             return GetStableColor(vec3(1.0), newIt, false);
         }
-        if(coloring == 1) {
+        if(ColoringType == 1) {
             return GetColorGlobal(newIt, color1, false);
         }
-        if(coloring == 2) {
+        if(ColoringType == 2) {
             return GetColorGlobal(newIt, color2, false);
         }
-        if(coloring == 3) {
+        if(ColoringType == 3) {
             return GetColorGlobal(newIt, color3, true);
-        }
-        if(coloring == 4) {
-            return GetColorIRacle(newIt, false);
         }
     }
 }
 
 void main() {
-    if(smoothMode == 0) {
+    if(SmoothMode == 0) {
         FragColor = mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy));
         return;
     }
@@ -254,6 +222,10 @@ void main() {
     for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
         vec4 temp = mainCalculate(uv);
+        if (temp == vec4(0.0)) {
+            FragColor = vec4(temp.xyz, 1.0);
+            return;
+        }
         col += temp.xyz;
     }
     FragColor = vec4(col / 4, 1.0);

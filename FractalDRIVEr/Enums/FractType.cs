@@ -3,7 +3,6 @@
     public enum FractType
     {
         MandelbrotSet,
-        JuilaSet,
-        BurningShip
+        JuilaSet
     }
 }

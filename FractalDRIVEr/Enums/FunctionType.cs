@@ -11,6 +11,6 @@
         Cosh,
         Tanh,
         Ctanh,
-        Custom1
+        Kabs,
     }
 }

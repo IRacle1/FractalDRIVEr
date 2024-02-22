@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Intrinsics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Mathematics;
 
-using Microsoft.VisualBasic;
-
-using OpenTK.Mathematics;
-
-namespace FractalDRIVEr
+namespace FractalDRIVEr.Extensions
 {
-    public struct Vector2Serializable
+    public readonly struct Vector2Serializable
     {
         public Vector2Serializable()
         {
-            
+
         }
 
         public Vector2Serializable(float x)
@@ -25,19 +16,19 @@ namespace FractalDRIVEr
 
         public Vector2Serializable(float x, float y)
         {
-            X = x; 
+            X = x;
             Y = y;
         }
 
-        public float X { get; set; }
-        public float Y { get; set; }
+        public float X { get; }
+        public float Y { get; }
 
         public static Vector2Serializable From(Vector2 vector)
         {
             return new(vector.X, vector.Y);
         }
 
-        public Vector2 To()
+        public readonly Vector2 To()
         {
             return new(X, Y);
         }
