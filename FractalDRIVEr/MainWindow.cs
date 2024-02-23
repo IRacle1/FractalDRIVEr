@@ -303,12 +303,12 @@ namespace FractalDRIVEr
             if (KeyboardState.IsKeyPressed(Keys.N))
             {
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
-                MainFunctionType = MainFunctionType.EditEnum(val);
+                BeforeFunctionType = BeforeFunctionType.EditEnum(val);
             }
             if (KeyboardState.IsKeyPressed(Keys.M))
             {
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
-                BeforeFunctionType = BeforeFunctionType.EditEnum(val);
+                MainFunctionType = MainFunctionType.EditEnum(val);
             }
             if (KeyboardState.IsKeyPressed(Keys.Comma))
             {
