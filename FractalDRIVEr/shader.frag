@@ -12,8 +12,6 @@ uniform float Intensity;
 uniform vec2 Delta;
 uniform float Scale;
 uniform vec2 resolution;
-uniform vec2 Pow;
-uniform vec2 Constant;
 uniform int ColoringType;
 uniform int SmoothMode;
 uniform float Barier;
@@ -25,6 +23,11 @@ uniform float Barier;
 
 uniform int[4] OldBehaviour;
 uniform int[4] Behaviour;
+
+// 0-1 - Pow
+// 2-3 - Const
+uniform float[4] OldVariables;
+uniform float[4] Variables;
 
 uniform float PeriodPersent;
 
@@ -165,16 +168,16 @@ vec2 DoFunction(int num, vec2 z) {
     return ret;
 }
 
-int mainCalculate(vec2 uv, int[4] behaviour) {
+int mainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
     vec2 z = uv;
-    vec2 c = Constant;
+    vec2 c = vec2(variables[2], variables[3]);
     if(behaviour[0] != 1) {
         c += uv;
     }
     int it = 0;
     for(int i = 0; i < MaxIterations; i++) {
         z = DoFunction(behaviour[2], z);
-        z = DoFunction(behaviour[1], ComplexPowFull(z, Pow));
+        z = DoFunction(behaviour[1], ComplexPowFull(z, vec2(variables[0], variables[1])));
         
         switch (behaviour[3]) {
             case 0:
@@ -198,9 +201,9 @@ int mainCalculate(vec2 uv, int[4] behaviour) {
     return it;
 }
 
-int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float coef) {
+int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
     vec2 z = uv;
-    vec2 c = Constant;
+    vec2 c = mix(vec2(variablesOne[2], variablesOne[3]), vec2(variablesTwo[2], variablesTwo[3]), coef);
 
     if (behaviourOne[0] == 0 && behaviourTwo[0] == 0) {
         c += uv;
@@ -215,7 +218,10 @@ int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float coef
     int it = 0;
     for(int i = 0; i < MaxIterations; i++) {
         z = mix(DoFunction(behaviourOne[2], z), DoFunction(behaviourTwo[2], z), coef);
-        z = ComplexPowFull(z, Pow);
+        
+        vec2 pow = mix(vec2(variablesOne[0], variablesOne[1]), vec2(variablesTwo[0], variablesTwo[1]), coef);
+        z = ComplexPowFull(z, pow);
+        
         z = mix(DoFunction(behaviourOne[1], z), DoFunction(behaviourTwo[1], z), coef);
         
         vec2 first = z;
@@ -282,10 +288,13 @@ vec4 PostCalculate(int it) {
 void main() {
     if(SmoothMode == 0) {
         if (PeriodPersent == 0.0f) {
-            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour));
+            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, Variables));
+        }
+        else if (PeriodPersent == 1.0f) {
+            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), OldBehaviour, OldVariables));
         }
         else {
-            FragColor = PostCalculate(SmartCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, OldBehaviour, PeriodPersent));
+            FragColor = PostCalculate(SmartCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, OldBehaviour, Variables, OldVariables, PeriodPersent));
         }
         return;
     }
@@ -293,7 +302,7 @@ void main() {
     vec3 col = vec3(0.0);
     for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
-        vec4 temp = PostCalculate(mainCalculate(uv, Behaviour));
+        vec4 temp = PostCalculate(mainCalculate(uv, Behaviour, Variables));
         if (temp == vec4(0.0)) {
             FragColor = vec4(temp.xyz, 1.0);
             return;

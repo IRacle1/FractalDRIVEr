@@ -31,8 +31,31 @@ namespace FractalDRIVEr
         public Vector2 Delta = (-1.5f, 0f);
         public float Scale { get; set; } = 2.3f;
 
-        public Vector2 Pow = (2f, 0f);
-        public Vector2 Constant = (0, 0);
+        public Vector2 Pow
+        {
+            get
+            {
+                return (Variables[0], Variables[1]);
+            }
+            set
+            {
+                Variables[0] = value.X;
+                Variables[1] = value.Y;
+            }
+        }
+
+        public Vector2 Constant
+        {
+            get
+            {
+                return (Variables[2], Variables[3]);
+            }
+            set
+            {
+                Variables[2] = value.X;
+                Variables[3] = value.Y;
+            }
+        }
 
         public FractType FractType 
         { 
@@ -82,12 +105,28 @@ namespace FractalDRIVEr
             }
         }
 
+        private float[] OldVariables = new float[4]
+        {
+            2f,
+            0f,
+            0f,
+            0f
+        };
+
         private int[] OldBehaviour = new int[4]
         {
             (int)FractType.MandelbrotSet,
             (int)FunctionType.None,
             (int)FunctionType.None,
             (int)ConstantFlag.Plus,
+        };
+
+        private float[] Variables = new float[4]
+        {
+            2f,
+            0f,
+            0f,
+            0f
         };
 
         private int[] Behaviour = new int[4]
@@ -188,6 +227,9 @@ namespace FractalDRIVEr
                 SmoothMode = false;
                 Barier = 4.0f;
                 ConstantFlag = ConstantFlag.Plus;
+                PeriodPersent = 0.0f;
+                Behaviour.CopyTo(OldBehaviour, 0);
+                Variables.CopyTo(OldVariables, 0);
             }
             if (KeyboardState.IsKeyPressed(Keys.Z))
             {
@@ -275,11 +317,8 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.Period))
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    OldBehaviour[i] = Behaviour[i];
-                    Console.WriteLine(OldBehaviour[i]);
-                }
+                Behaviour.CopyTo(OldBehaviour, 0);
+                Variables.CopyTo(OldVariables, 0);
             }
             if (KeyboardState.IsKeyDown(Keys.KeyPadAdd))
             {
@@ -306,15 +345,19 @@ namespace FractalDRIVEr
 
         private void UpdateUniforms()
         {
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(MaxIterations)), MaxIterations);
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(resolution)), ref resolution);
+
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(MaxIterations)), MaxIterations);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Scale)), Scale);
             GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(Delta)), ref Delta);
-            GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(Constant)), ref Constant);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Intensity)), Intensity);
-            GL.Uniform2(GL.GetUniformLocation(shader.Handle, nameof(Pow)), Pow);
+            
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Behaviour)), Behaviour.Length, Behaviour);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(OldBehaviour)), OldBehaviour.Length, OldBehaviour);
+
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Variables)), Variables.Length, Variables);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(OldVariables)), OldVariables.Length, OldVariables);
+
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(ColoringType)), (int)ColoringType);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(SmoothMode)), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Barier)), Barier);
