@@ -196,7 +196,9 @@ float MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
     if(behaviour[0] != 1) {
         c += uv;
     }
-    float it = 0.0f;
+
+    int it = 0;
+
     for(int i = 0; i < MaxIterations; i++) {
         z = ExecFunction(z, pow, c, behaviour);
 
@@ -225,7 +227,8 @@ float SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4]
         c += uv * coef;
     }
 
-    float it = 0.0f;
+    int it = 0;
+
     for(int i = 0; i < MaxIterations; i++) {
         vec2 first = ExecFunction(z, pow, c, behaviourOne);
         vec2 second = ExecFunction(z, pow, c, behaviourTwo);
