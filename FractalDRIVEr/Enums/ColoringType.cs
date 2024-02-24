@@ -6,5 +6,4 @@ public enum ColoringType
     Global1,
     Global2,
     Global3,
-    IRacleOld,
 }

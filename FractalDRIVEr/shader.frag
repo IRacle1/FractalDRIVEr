@@ -31,6 +31,8 @@ uniform float[4] Variables;
 
 uniform float PeriodPersent;
 
+uniform float Time;
+
 out vec4 FragColor;
 
 mat4x3 color1 = mat4x3(
@@ -40,16 +42,16 @@ mat4x3 color1 = mat4x3(
     vec3(0.0, 0.1, 0.2));
 
 mat4x3 color2 = mat4x3(
-    vec3(0.5, 0.5, 0.5), 
+    vec3(1, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
-    vec3(2.0, 1.0, 0.0),
-    vec3(0.5, 0.2, 0.25));
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
 
 mat4x3 color3 = mat4x3(
-    vec3(0.000, 0.500, 0.500), 
-    vec3(0.000, 0.500, 0.500),
-    vec3(0.000, 0.500, 0.333),
-    vec3(0.000, 0.500, 0.667));
+    vec3(0.3, 0.2, 0.5), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
 
 float random(in vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.989, 78.233))) * 43758.543);
@@ -280,7 +282,7 @@ vec4 PostCalculate(int it) {
             return GetColorGlobal(newIt, color2, false);
         }
         if(ColoringType == 3) {
-            return GetColorGlobal(newIt, color3, true);
+            return GetColorGlobal(newIt, color3, false);
         }
     }
 }

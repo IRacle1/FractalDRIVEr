@@ -147,6 +147,8 @@ namespace FractalDRIVEr
 
         public BitArray DownedKeys => (BitArray)keysField.GetValue(KeyboardState)!;
 
+        public float Time { get; set; } = 0.0f;
+
         public MainWindow(int width, int height, string title) :
             base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title, Vsync = VSyncMode.On })
         {
@@ -172,6 +174,7 @@ namespace FractalDRIVEr
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            Time += (float)e.Time;
             if (KeyboardState.IsKeyPressed(Keys.F11))
             {
                 WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
@@ -362,6 +365,8 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(SmoothMode)), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Barier)), Barier);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(PeriodPersent)), PeriodPersent);
+
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Time)), Time);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
