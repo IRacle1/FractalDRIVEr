@@ -35,7 +35,7 @@ uniform float Time;
 
 out vec4 FragColor;
 
-bool LifeIsStrange = true;
+bool LifeIsStrange = false;
 
 mat4x3 color1 = mat4x3(
     vec3(0.5, 0.5, 0.5), 
@@ -174,28 +174,36 @@ bool ExitAlgorithm(int it, vec2 z, float barier) {
     return Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier;
 }
 
+vec2 ExecFunction(vec2 z, vec2 pow, vec2 c, int[4] behaviour) {
+    vec2 newZ = z;
+    newZ = DoFunction(behaviour[2], newZ);
+    newZ = DoFunction(behaviour[1], ComplexPowFull(newZ, pow));
+
+    switch (behaviour[3]) {
+        case 0:
+            newZ += c;
+            break;
+        case 1:
+            newZ = ComplexPowFull(z, c);
+            break;
+        case 2:
+            newZ = ComplexPowFull(c, z);
+            break;
+    }
+
+    return newZ;
+}
+
 vec3 MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
     vec2 z = uv;
     vec2 c = vec2(variables[2], variables[3]);
+    vec2 pow = vec2(variables[0], variables[1]);
     if(behaviour[0] != 1) {
         c += uv;
     }
     int it = 0;
     for(int i = 0; i < MaxIterations; i++) {
-        z = DoFunction(behaviour[2], z);
-        z = DoFunction(behaviour[1], ComplexPowFull(z, vec2(variables[0], variables[1])));
-        
-        switch (behaviour[3]) {
-            case 0:
-                z += c;
-                break;
-            case 1:
-                z = ComplexPowFull(z, c);
-                break;
-            case 2:
-                z = ComplexPowFull(c, z);
-                break;
-        }
+        z = ExecFunction(z, pow, c, behaviour);
 
         if (ExitAlgorithm(it, z, Barier)) {
             break;
@@ -210,6 +218,7 @@ vec3 MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
 vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
     vec2 z = uv;
     vec2 c = mix(vec2(variablesOne[2], variablesOne[3]), vec2(variablesTwo[2], variablesTwo[3]), coef);
+    vec2 pow = mix(vec2(variablesOne[0], variablesOne[1]), vec2(variablesTwo[0], variablesTwo[1]), coef);
 
     if (behaviourOne[0] == 0 && behaviourTwo[0] == 0) {
         c += uv;
@@ -223,39 +232,8 @@ vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] 
 
     int it = 0;
     for(int i = 0; i < MaxIterations; i++) {
-        z = mix(DoFunction(behaviourOne[2], z), DoFunction(behaviourTwo[2], z), coef);
-        
-        vec2 pow = mix(vec2(variablesOne[0], variablesOne[1]), vec2(variablesTwo[0], variablesTwo[1]), coef);
-        z = ComplexPowFull(z, pow);
-        
-        z = mix(DoFunction(behaviourOne[1], z), DoFunction(behaviourTwo[1], z), coef);
-        
-        vec2 first = z;
-        vec2 second = z;
-
-        switch (behaviourOne[3]) {
-            case 0:
-                first += c;
-                break;
-            case 1:
-                first = ComplexPowFull(first, c);
-                break;
-            case 2:
-                first = ComplexPowFull(c, first);
-                break;
-        }
-
-        switch (behaviourTwo[3]) {
-            case 0:
-                second += c;
-                break;
-            case 1:
-                second = ComplexPowFull(second, c);
-                break;
-            case 2:
-                second = ComplexPowFull(c, second);
-                break;
-        }
+        vec2 first = ExecFunction(z, pow, c, behaviourOne);
+        vec2 second = ExecFunction(z, pow, c, behaviourTwo);
         
         z = mix(first, second, coef);
 
