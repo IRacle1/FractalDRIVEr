@@ -35,8 +35,6 @@ uniform float Time;
 
 out vec4 FragColor;
 
-bool LifeIsStrange = false;
-
 mat4x3 color1 = mat4x3(
     vec3(0.5, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
@@ -168,9 +166,6 @@ vec2 DoFunction(int num, vec2 z) {
 }
 
 bool ExitAlgorithm(float it, vec2 z, float barier) {
-    if (LifeIsStrange) {
-        return false;
-    }
     return Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier;
 }
 
@@ -248,16 +243,6 @@ float SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4]
 }
 
 vec4 PostCalculate(float it) {
-    if (LifeIsStrange) 
-    {
-        float coef = 1 / float(MaxIterations) * it;
-        if (coef <= 0) {
-            return vec4(0.0);
-        }
-        else {
-            return vec4(1.0);
-        }
-    }
     if(it >= MaxIterations) {
         return vec4(0.0);
     }
