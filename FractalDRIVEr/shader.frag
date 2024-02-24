@@ -35,6 +35,8 @@ uniform float Time;
 
 out vec4 FragColor;
 
+bool LifeIsStrange = true;
+
 mat4x3 color1 = mat4x3(
     vec3(0.5, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
@@ -116,22 +118,17 @@ vec2 GetCoordRand(vec2 cord, vec2 res) {
     return (Delta - (Scale / vec2(2.0, 2.0))) + (cord + random2()) * (Scale / res);
 }
 
-vec4 GetStableColor(vec3 color, float it, bool isNew) {
+vec4 GetStableColor(vec3 color, float it) {
     float newValue = float(it) / float(MaxIterations) * Intensity;
-
-    if(isNew) {
-        newValue = fract(newValue + 0.5);
-    }
 
     vec3 newColor = color * newValue;
     return vec4(newColor, 1.0);
 }
 
-vec4 GetColorGlobal(float it, mat4x3 pattern, bool isNew) {
+vec4 GetColorGlobal(float it, mat4x3 pattern) {
     float val = float(it) / MaxIterations * Intensity;
-    if(!isNew) {
-        val = fract(val + 0.5);
-    }
+
+    val = fract(val + 0.5);
 
     return vec4(pattern[0] + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
 }
@@ -170,7 +167,14 @@ vec2 DoFunction(int num, vec2 z) {
     return ret;
 }
 
-int mainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
+bool ExitAlgorithm(int it, vec2 z, float barier) {
+    if (LifeIsStrange) {
+        return false;
+    }
+    return Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier;
+}
+
+vec3 MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
     vec2 z = uv;
     vec2 c = vec2(variables[2], variables[3]);
     if(behaviour[0] != 1) {
@@ -193,17 +197,17 @@ int mainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
                 break;
         }
 
-        if(Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier) {
+        if (ExitAlgorithm(it, z, Barier)) {
             break;
         }
 
         it++;
     }
 
-    return it;
+    return vec3(z, it);
 }
 
-int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
+vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
     vec2 z = uv;
     vec2 c = mix(vec2(variablesOne[2], variablesOne[3]), vec2(variablesTwo[2], variablesTwo[3]), coef);
 
@@ -255,17 +259,44 @@ int SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] v
         
         z = mix(first, second, coef);
 
-        if(Barier > 0 ? dot(z, z) > Barier * Barier : dot(z, z) < Barier * Barier) {
+        if (ExitAlgorithm(it, z, Barier)) {
             break;
         }
 
         it++;
     }
 
-    return it;
+    return vec3(z, it);
 }
 
-vec4 PostCalculate(int it) {
+vec4 PostCalculate(vec2 z0, vec3 info) {
+    float it = info.z;
+    vec2 z = info.xy;
+
+    if (LifeIsStrange) 
+    {
+        float coef = 1 / it * log(length(z) / length(z0));
+        if (coef < 0) {
+            return vec4(0.0, 0.0, 0.0, 0.0);
+        }
+
+        return vec4(1.0, 1.0, 1.0, 1.0);
+
+        float newIt = coef;
+
+        if(ColoringType == 0) {
+            return GetStableColor(vec3(1.0), newIt);
+        }
+        if(ColoringType == 1) {
+            return GetColorGlobal(newIt, color1);
+        }
+        if(ColoringType == 2) {
+            return GetColorGlobal(newIt, color2);
+        }
+        if(ColoringType == 3) {
+            return GetColorGlobal(newIt, color3);
+        }
+    }
     if(it >= MaxIterations) {
         return vec4(0.0, 0.0, 0.0, 0.0);
     } 
@@ -273,30 +304,31 @@ vec4 PostCalculate(int it) {
         float newIt = float(it);
 
         if(ColoringType == 0) {
-            return GetStableColor(vec3(1.0), newIt, false);
+            return GetStableColor(vec3(1.0), newIt);
         }
         if(ColoringType == 1) {
-            return GetColorGlobal(newIt, color1, false);
+            return GetColorGlobal(newIt, color1);
         }
         if(ColoringType == 2) {
-            return GetColorGlobal(newIt, color2, false);
+            return GetColorGlobal(newIt, color2);
         }
         if(ColoringType == 3) {
-            return GetColorGlobal(newIt, color3, false);
+            return GetColorGlobal(newIt, color3);
         }
     }
 }
 
 void main() {
     if(SmoothMode == 0) {
+        vec2 uv = GetCoord(gl_FragCoord.xy, resolution.yy);
         if (PeriodPersent == 0.0f) {
-            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, Variables));
+            FragColor = PostCalculate(uv, MainCalculate(uv, Behaviour, Variables));
         }
         else if (PeriodPersent == 1.0f) {
-            FragColor = PostCalculate(mainCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), OldBehaviour, OldVariables));
+            FragColor = PostCalculate(uv, MainCalculate(uv, OldBehaviour, OldVariables));
         }
         else {
-            FragColor = PostCalculate(SmartCalculate(GetCoord(gl_FragCoord.xy, resolution.yy), Behaviour, OldBehaviour, Variables, OldVariables, PeriodPersent));
+            FragColor = PostCalculate(uv, SmartCalculate(uv, Behaviour, OldBehaviour, Variables, OldVariables, PeriodPersent));
         }
         return;
     }
@@ -304,7 +336,7 @@ void main() {
     vec3 col = vec3(0.0);
     for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
-        vec4 temp = PostCalculate(mainCalculate(uv, Behaviour, Variables));
+        vec4 temp = PostCalculate(uv, MainCalculate(uv, Behaviour, Variables));
         if (temp == vec4(0.0)) {
             FragColor = vec4(temp.xyz, 1.0);
             return;
