@@ -167,7 +167,7 @@ vec2 DoFunction(int num, vec2 z) {
     return ret;
 }
 
-bool ExitAlgorithm(int it, vec2 z, float barier) {
+bool ExitAlgorithm(float it, vec2 z, float barier) {
     if (LifeIsStrange) {
         return false;
     }
@@ -184,24 +184,24 @@ vec2 ExecFunction(vec2 z, vec2 pow, vec2 c, int[4] behaviour) {
             newZ += c;
             break;
         case 1:
-            newZ = ComplexPowFull(z, c);
+            newZ = ComplexPowFull(newZ, c);
             break;
         case 2:
-            newZ = ComplexPowFull(c, z);
+            newZ = ComplexPowFull(c, newZ);
             break;
     }
 
     return newZ;
 }
 
-vec3 MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
+float MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
     vec2 z = uv;
     vec2 c = vec2(variables[2], variables[3]);
     vec2 pow = vec2(variables[0], variables[1]);
     if(behaviour[0] != 1) {
         c += uv;
     }
-    int it = 0;
+    float it = 0.0f;
     for(int i = 0; i < MaxIterations; i++) {
         z = ExecFunction(z, pow, c, behaviour);
 
@@ -212,10 +212,10 @@ vec3 MainCalculate(vec2 uv, int[4] behaviour, float[4] variables) {
         it++;
     }
 
-    return vec3(z, it);
+    return it;
 }
 
-vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
+float SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] variablesOne, float[4] variablesTwo, float coef) {
     vec2 z = uv;
     vec2 c = mix(vec2(variablesOne[2], variablesOne[3]), vec2(variablesTwo[2], variablesTwo[3]), coef);
     vec2 pow = mix(vec2(variablesOne[0], variablesOne[1]), vec2(variablesTwo[0], variablesTwo[1]), coef);
@@ -230,7 +230,7 @@ vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] 
         c += uv * coef;
     }
 
-    int it = 0;
+    float it = 0.0f;
     for(int i = 0; i < MaxIterations; i++) {
         vec2 first = ExecFunction(z, pow, c, behaviourOne);
         vec2 second = ExecFunction(z, pow, c, behaviourTwo);
@@ -244,40 +244,23 @@ vec3 SmartCalculate(vec2 uv, int[4] behaviourOne, int[4] behaviourTwo, float[4] 
         it++;
     }
 
-    return vec3(z, it);
+    return it;
 }
 
-vec4 PostCalculate(vec2 z0, vec3 info) {
-    float it = info.z;
-    vec2 z = info.xy;
-
+vec4 PostCalculate(float it) {
     if (LifeIsStrange) 
     {
-        float coef = 1 / it * log(length(z) / length(z0));
-        if (coef < 0) {
-            return vec4(0.0, 0.0, 0.0, 0.0);
+        float coef = 1 / float(MaxIterations) * it;
+        if (coef <= 0) {
+            return vec4(0.0);
         }
-
-        return vec4(1.0, 1.0, 1.0, 1.0);
-
-        float newIt = coef;
-
-        if(ColoringType == 0) {
-            return GetStableColor(vec3(1.0), newIt);
-        }
-        if(ColoringType == 1) {
-            return GetColorGlobal(newIt, color1);
-        }
-        if(ColoringType == 2) {
-            return GetColorGlobal(newIt, color2);
-        }
-        if(ColoringType == 3) {
-            return GetColorGlobal(newIt, color3);
+        else {
+            return vec4(1.0);
         }
     }
     if(it >= MaxIterations) {
-        return vec4(0.0, 0.0, 0.0, 0.0);
-    } 
+        return vec4(0.0);
+    }
     else {
         float newIt = float(it);
 
@@ -300,13 +283,13 @@ void main() {
     if(SmoothMode == 0) {
         vec2 uv = GetCoord(gl_FragCoord.xy, resolution.yy);
         if (PeriodPersent == 0.0f) {
-            FragColor = PostCalculate(uv, MainCalculate(uv, Behaviour, Variables));
+            FragColor = PostCalculate(MainCalculate(uv, Behaviour, Variables));
         }
         else if (PeriodPersent == 1.0f) {
-            FragColor = PostCalculate(uv, MainCalculate(uv, OldBehaviour, OldVariables));
+            FragColor = PostCalculate(MainCalculate(uv, OldBehaviour, OldVariables));
         }
         else {
-            FragColor = PostCalculate(uv, SmartCalculate(uv, Behaviour, OldBehaviour, Variables, OldVariables, PeriodPersent));
+            FragColor = PostCalculate(SmartCalculate(uv, Behaviour, OldBehaviour, Variables, OldVariables, PeriodPersent));
         }
         return;
     }
@@ -314,7 +297,7 @@ void main() {
     vec3 col = vec3(0.0);
     for(int i = 0; i < 4; i++) {
         vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
-        vec4 temp = PostCalculate(uv, MainCalculate(uv, Behaviour, Variables));
+        vec4 temp = PostCalculate(MainCalculate(uv, Behaviour, Variables));
         if (temp == vec4(0.0)) {
             FragColor = vec4(temp.xyz, 1.0);
             return;
