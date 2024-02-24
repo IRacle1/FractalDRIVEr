@@ -10,7 +10,7 @@ public static class MainExtensions
     private static readonly List<MethodInfo> methods = typeof(GL).GetMethods(BindingFlags.Static | BindingFlags.Public).Where(m => m.Name.StartsWith("Uniform")).ToList();
     private static readonly Dictionary<Type, MethodInfo> filledMethods = new();
 
-    public static Vector2 Lerp(Vector2 firstFloat, Vector2 secondFloat, float by)
+    public static Vector2 Lerp(Vector2 secondFloat, Vector2 firstFloat, float by)
     {
         return firstFloat * (1 - by) + secondFloat * by;
     }

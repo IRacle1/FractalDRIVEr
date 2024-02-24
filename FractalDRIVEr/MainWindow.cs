@@ -141,6 +141,8 @@ namespace FractalDRIVEr
 
         public float Barier { get; set; } = 4.0f;
 
+        public bool Pixel { get; set; } = false;
+
         Vector2 mouse;
 
         private readonly FieldInfo keysField = typeof(KeyboardState).GetField("_keys", BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -185,7 +187,7 @@ namespace FractalDRIVEr
             if (KeyboardState.IsKeyDown(Keys.Q) || KeyboardState.IsKeyDown(Keys.E))
             {
                 Vector2 rawDelta = Delta - new Vector2(Scale / 2) + mouse * (Scale / resolution.Y);
-                Delta = MainExtensions.Lerp(Delta, rawDelta, 0.1f);
+                Delta = MainExtensions.Lerp(rawDelta, Delta, 0.1f);
 
                 if (KeyboardState.IsKeyDown(Keys.Q))
                 {
@@ -336,6 +338,10 @@ namespace FractalDRIVEr
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
                 ConstantFlag = ConstantFlag.EditEnum(val);
             }
+            if (KeyboardState.IsKeyPressed(Keys.P))
+            {
+                Pixel = !Pixel;
+            }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
@@ -367,6 +373,8 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(PeriodPersent)), PeriodPersent);
 
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Time)), Time);
+
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Pixel)), Pixel ? 1 : 0);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

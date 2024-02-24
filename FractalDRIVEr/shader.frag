@@ -32,6 +32,7 @@ uniform float[4] Variables;
 uniform float PeriodPersent;
 
 uniform float Time;
+uniform int Pixel;
 
 out vec4 FragColor;
 
