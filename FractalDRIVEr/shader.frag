@@ -117,14 +117,14 @@ vec2 GetCoordRand(vec2 cord, vec2 res) {
 }
 
 vec4 GetStableColor(vec3 color, float it) {
-    float newValue = float(it) / float(MaxIterations) * Intensity;
+    float newValue = it / MaxIterations * Intensity;
 
     vec3 newColor = color * newValue;
     return vec4(newColor, 1.0);
 }
 
 vec4 GetColorGlobal(float it, mat4x3 pattern) {
-    float val = float(it) / MaxIterations * Intensity;
+    float val = it / MaxIterations * Intensity;
 
     val = fract(val + 0.5);
 
