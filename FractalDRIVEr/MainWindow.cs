@@ -141,7 +141,7 @@ namespace FractalDRIVEr
 
         public float Barier { get; set; } = 4.0f;
 
-        public bool Pixel { get; set; } = false;
+        public int Pixel { get; set; } = 1;
 
         Vector2 mouse;
 
@@ -340,7 +340,16 @@ namespace FractalDRIVEr
             }
             if (KeyboardState.IsKeyPressed(Keys.P))
             {
-                Pixel = !Pixel;
+                int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
+                Pixel += val;
+                if (Pixel >= 16)
+                {
+                    Pixel = 1;
+                }
+                else if (Pixel < 1)
+                {
+                    Pixel = 16;
+                }
             }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
@@ -374,7 +383,7 @@ namespace FractalDRIVEr
 
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Time)), Time);
 
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Pixel)), Pixel ? 1 : 0);
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Pixel)), Pixel);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

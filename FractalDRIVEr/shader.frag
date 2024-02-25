@@ -269,8 +269,13 @@ vec4 PostCalculate(float it) {
 }
 
 void main() {
+    vec2 coord = vec2(int(gl_FragCoord.x / Pixel), int(gl_FragCoord.y / Pixel));
+    vec2 res = vec2(int(resolution.y / Pixel));
+
     if(SmoothMode == 0) {
-        vec2 uv = GetCoord(gl_FragCoord.xy, resolution.yy);
+
+        vec2 uv = GetCoord(coord, res);
+
         if (PeriodPersent == 0.0f) {
             FragColor = PostCalculate(MainCalculate(uv, Behaviour, Variables));
         }
@@ -285,7 +290,7 @@ void main() {
 
     vec3 col = vec3(0.0);
     for(int i = 0; i < 4; i++) {
-        vec2 uv = GetCoordRand(gl_FragCoord.xy, resolution.yy);
+        vec2 uv = GetCoordRand(coord, res);
         vec4 temp = PostCalculate(MainCalculate(uv, Behaviour, Variables));
         if (temp == vec4(0.0)) {
             FragColor = vec4(temp.xyz, 1.0);
