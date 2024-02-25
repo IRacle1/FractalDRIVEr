@@ -11,6 +11,7 @@
         Cosh,
         Tanh,
         Ctanh,
+        Ln,
         Kabs,
     }
 }

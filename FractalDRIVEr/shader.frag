@@ -160,6 +160,8 @@ vec2 DoFunction(int num, vec2 z) {
             ret = ComplexCtanh(z);
             break;
         case 9:
+            ret = ComplexLn(z);
+        case 10:
             ret = abs(z);
     }
 
