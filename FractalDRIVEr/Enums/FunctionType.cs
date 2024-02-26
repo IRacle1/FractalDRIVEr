@@ -12,6 +12,10 @@
         Tanh,
         Ctanh,
         Ln,
-        Kabs,
+        Conj,
+        Inverse,
+        Rabs,
+        Iabs,
+        Abs,
     }
 }
