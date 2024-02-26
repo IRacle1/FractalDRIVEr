@@ -430,7 +430,7 @@ namespace FractalDRIVEr
             {
                 FunctionBehaviour = new FunctionBehaviour
                 {
-                    BeforeFunctionType = FunctionType.None,
+                    BeforeFunctionType = BeforeFunctionType,
                     MainFunctionType = MainFunctionType,
                     ConstantFlag = ConstantFlag,
                     FractType = FractType,

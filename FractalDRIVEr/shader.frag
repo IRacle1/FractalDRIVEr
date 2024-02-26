@@ -161,8 +161,22 @@ vec2 DoFunction(int num, vec2 z) {
             break;
         case 9:
             ret = ComplexLn(z);
+            break;
         case 10:
+            ret = vec2(z.x, -z.y);
+            break;
+        case 11:
+            ret = ComplexDiv(vec2(1, 0), z);
+            break;
+        case 12:
+            ret = vec2(abs(z.x), z.y);
+            break;
+        case 13:
+            ret = vec2(z.x, abs(z.y));
+            break;
+        case 14:
             ret = abs(z);
+            break;
     }
 
     return ret;
