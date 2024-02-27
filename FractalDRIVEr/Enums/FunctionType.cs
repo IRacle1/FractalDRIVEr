@@ -14,8 +14,6 @@
         Ln,
         Conj,
         Inverse,
-        Rabs,
-        Iabs,
         Abs,
     }
 }
