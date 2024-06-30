@@ -2,8 +2,12 @@
 
 public enum ColoringType
 {
+    Black,
     Default,
-    Global1,
-    Global2,
-    Global3,
+    Pink,
+    Green,
+    Blue,
+    Aqua,
+    Lime,
+    Purple,
 }

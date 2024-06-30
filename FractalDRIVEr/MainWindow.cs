@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 
 using FractalDRIVEr.Enums;
@@ -26,7 +27,7 @@ namespace FractalDRIVEr
         public float Intensity { get; set; } = 1f;
         public int MaxIterations { get; set; } = 100;
         public bool SmoothMode { get; set; } = false;
-        public ColoringType ColoringType { get; set; } = ColoringType.Default;
+        public ColoringType ColoringType { get; set; } = ColoringType.Black;
 
         public Vector2 Delta = (-1.5f, 0f);
         public float Scale { get; set; } = 2.3f;
@@ -249,7 +250,7 @@ namespace FractalDRIVEr
             {
                 MaxIterations = 100;
                 Intensity = 1;
-                ColoringType = ColoringType.Default;
+                ColoringType = ColoringType.Black;
                 SmoothMode = false;
                 Barier = 4.0f;
             }

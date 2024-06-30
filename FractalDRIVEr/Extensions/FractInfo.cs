@@ -30,7 +30,7 @@ namespace FractalDRIVEr.Extensions
     {
         public bool SmoothMode { get; set; } = false;
         public int MaxIterations { get; set; } = 100;
-        public ColoringType ColoringType { get; set; } = ColoringType.Default;
+        public ColoringType ColoringType { get; set; } = ColoringType.Black;
         public float Intensity { get; set; } = 1f;
     }
 }

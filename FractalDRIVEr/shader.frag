@@ -36,20 +36,44 @@ uniform int Pixel;
 
 out vec4 FragColor;
 
-mat4x3 color1 = mat4x3(
+mat4x3 Default = mat4x3(
     vec3(0.5, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
     vec3(1.0, 1.0, 1.0),
     vec3(0.0, 0.1, 0.2));
 
-mat4x3 color2 = mat4x3(
+mat4x3 Pink = mat4x3(
     vec3(1, 0.5, 0.5), 
     vec3(0.6, 0.5, 0.5),
     vec3(1.0, 1.0, 1.0),
     vec3(0.0, 0.1, 0.2));
 
-mat4x3 color3 = mat4x3(
+mat4x3 Green = mat4x3(
     vec3(0.5, 1, 0.5), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
+
+mat4x3 Blue = mat4x3(
+    vec3(0.5, 0.5, 1), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
+
+mat4x3 Aqua = mat4x3(
+    vec3(0.5, 1, 1), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
+
+mat4x3 Lime = mat4x3(
+    vec3(1, 1, 0.5), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
+
+ mat4x3 Purple = mat4x3(
+    vec3(1, 0.5, 1), 
     vec3(0.6, 0.5, 0.5),
     vec3(1.0, 1.0, 1.0),
     vec3(0.0, 0.1, 0.2));
@@ -263,17 +287,23 @@ vec4 PostCalculate(float it) {
     else {
         float newIt = float(it);
 
-        if(ColoringType == 0) {
-            return GetStableColor(vec3(1.0), newIt);
-        }
-        if(ColoringType == 1) {
-            return GetColorGlobal(newIt, color1);
-        }
-        if(ColoringType == 2) {
-            return GetColorGlobal(newIt, color2);
-        }
-        if(ColoringType == 3) {
-            return GetColorGlobal(newIt, color3);
+        switch (ColoringType) {
+            case 0:
+                return GetStableColor(vec3(1.0), newIt);
+            case 1:
+                return GetColorGlobal(newIt, Default);
+            case 2:
+                return GetColorGlobal(newIt, Pink);
+            case 3:
+                return GetColorGlobal(newIt, Green);
+            case 4:
+                return GetColorGlobal(newIt, Blue);
+            case 5:
+                return GetColorGlobal(newIt, Aqua);
+            case 6:
+                return GetColorGlobal(newIt, Lime);
+            case 7:
+                return GetColorGlobal(newIt, Purple);
         }
     }
 }
