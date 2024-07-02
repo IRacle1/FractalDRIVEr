@@ -27,7 +27,8 @@ namespace FractalDRIVEr
         public float Intensity { get; set; } = 1f;
         public int MaxIterations { get; set; } = 100;
         public bool SmoothMode { get; set; } = false;
-        public ColoringType ColoringType { get; set; } = ColoringType.Black;
+        public ColoringType ColoringType { get; set; } = ColoringType.Default;
+        public Color4 Color { get; set; } = ColoringType.Default.ToColor4();
 
         public Vector2 Delta = (-1.5f, 0f);
         public float Scale { get; set; } = 2.3f;
@@ -251,6 +252,7 @@ namespace FractalDRIVEr
                 MaxIterations = 100;
                 Intensity = 1;
                 ColoringType = ColoringType.Black;
+                Color = ColoringType.ToColor4();
                 SmoothMode = false;
                 Barier = 4.0f;
             }
@@ -305,6 +307,7 @@ namespace FractalDRIVEr
             {
                 int val = KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1;
                 ColoringType = ColoringType.EditEnum(val);
+                Color = ColoringType.ToColor4();
             }
             if (KeyboardState.IsKeyPressed(Keys.N))
             {
@@ -352,6 +355,33 @@ namespace FractalDRIVEr
                     Pixel = 16;
                 }
             }
+            if (KeyboardState.IsKeyDown(Keys.U))
+            {
+                float newR = Color.R + (KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1) * speedModif / 255f;
+                if (newR >= 1.0f)
+                    newR = 0.0f;
+                else if (newR <= 0.0f)
+                    newR = 1.0f;
+                Color = new Color4(newR, Color.G, Color.B, Color.A);
+            }
+            if (KeyboardState.IsKeyDown(Keys.I))
+            {
+                float newG = Color.G + (KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1) * speedModif / 255f;
+                if (newG >= 1.0f)
+                    newG = 0.0f;
+                else if (newG <= 0.0f)
+                    newG = 1.0f;
+                Color = new Color4(Color.R, newG, Color.B, Color.A);
+            }
+            if (KeyboardState.IsKeyDown(Keys.O))
+            {
+                float newB = Color.B + (KeyboardState.IsKeyDown(Keys.LeftShift) ? -1 : 1) * speedModif / 255f;
+                if (newB >= 1.0f)
+                    newB = 0.0f;
+                else if (newB <= 0.0f)
+                    newB = 1.0f;
+                Color = new Color4(Color.R, Color.G, newB, Color.A);
+            }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
@@ -377,7 +407,8 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Variables)), Variables.Length, Variables);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(OldVariables)), OldVariables.Length, OldVariables);
 
-            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(ColoringType)), (int)ColoringType);
+            GL.Uniform4(GL.GetUniformLocation(shader.Handle, nameof(Color)), Color);
+
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(SmoothMode)), SmoothMode ? 1 : 0);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Barier)), Barier);
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(PeriodPersent)), PeriodPersent);

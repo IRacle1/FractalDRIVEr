@@ -12,7 +12,7 @@ uniform float Intensity;
 uniform vec2 Delta;
 uniform float Scale;
 uniform vec2 resolution;
-uniform int ColoringType;
+uniform vec4 Color;
 uniform int SmoothMode;
 uniform float Barier;
 
@@ -35,6 +35,12 @@ uniform float Time;
 uniform int Pixel;
 
 out vec4 FragColor;
+
+mat4x3 Global = mat4x3(
+    vec3(0.0, 0.0, 0.0), 
+    vec3(0.6, 0.5, 0.5),
+    vec3(1.0, 1.0, 1.0),
+    vec3(0.0, 0.1, 0.2));
 
 mat4x3 Default = mat4x3(
     vec3(0.5, 0.5, 0.5), 
@@ -141,19 +147,12 @@ vec2 GetCoordRand(vec2 cord, vec2 res) {
     return (Delta - (Scale / vec2(2.0, 2.0))) + (cord + random2()) * (Scale / res);
 }
 
-vec4 GetStableColor(vec3 color, float it) {
-    float newValue = it / MaxIterations * Intensity;
-
-    vec3 newColor = color * newValue;
-    return vec4(newColor, 1.0);
-}
-
-vec4 GetColorGlobal(float it, mat4x3 pattern) {
+vec4 GetColorGlobal(float it, mat4x3 pattern, vec3 col) {
     float val = it / MaxIterations * Intensity;
 
     val = fract(val + 0.5);
 
-    return vec4(pattern[0] + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
+    return vec4(col + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
 }
 
 vec2 DoFunction(int num, vec2 z) {
@@ -286,25 +285,7 @@ vec4 PostCalculate(float it) {
     }
     else {
         float newIt = float(it);
-
-        switch (ColoringType) {
-            case 0:
-                return GetStableColor(vec3(1.0), newIt);
-            case 1:
-                return GetColorGlobal(newIt, Default);
-            case 2:
-                return GetColorGlobal(newIt, Pink);
-            case 3:
-                return GetColorGlobal(newIt, Green);
-            case 4:
-                return GetColorGlobal(newIt, Blue);
-            case 5:
-                return GetColorGlobal(newIt, Aqua);
-            case 6:
-                return GetColorGlobal(newIt, Lime);
-            case 7:
-                return GetColorGlobal(newIt, Purple);
-        }
+        return GetColorGlobal(newIt, Global, Color.xyz);
     }
 }
 
