@@ -251,7 +251,7 @@ namespace FractalDRIVEr
             {
                 MaxIterations = 100;
                 Intensity = 1;
-                ColoringType = ColoringType.Black;
+                ColoringType = ColoringType.Default;
                 Color = ColoringType.ToColor4();
                 SmoothMode = false;
                 Barier = 4.0f;

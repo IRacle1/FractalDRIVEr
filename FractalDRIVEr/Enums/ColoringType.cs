@@ -2,7 +2,6 @@
 
 public enum ColoringType
 {
-    Black,
     Default,
     Pink,
     Green,
@@ -10,4 +9,6 @@ public enum ColoringType
     Aqua,
     Lime,
     Purple,
+    Pure,
+    Dark
 }
