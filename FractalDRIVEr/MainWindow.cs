@@ -145,6 +145,8 @@ namespace FractalDRIVEr
 
         public int Pixel { get; set; } = 1;
 
+        public bool InversedColor { get; set; } = false;
+
         Vector2 mouse;
 
         private readonly FieldInfo keysField = typeof(KeyboardState).GetField("_keys", BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -255,6 +257,7 @@ namespace FractalDRIVEr
                 Color = ColoringType.ToColor4();
                 SmoothMode = false;
                 Barier = 4.0f;
+                InversedColor = false;
             }
             if (KeyboardState.IsKeyDown(Keys.Left))
             {
@@ -382,6 +385,10 @@ namespace FractalDRIVEr
                     newB = 1.0f;
                 Color = new Color4(Color.R, Color.G, newB, Color.A);
             }
+            if (KeyboardState.IsKeyPressed(Keys.Y))
+            {
+                InversedColor = !InversedColor;
+            }
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Close();
@@ -416,6 +423,8 @@ namespace FractalDRIVEr
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Time)), Time);
 
             GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(Pixel)), Pixel);
+
+            GL.Uniform1(GL.GetUniformLocation(shader.Handle, nameof(InversedColor)), InversedColor ? 1 : 0);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)

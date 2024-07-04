@@ -34,6 +34,8 @@ uniform float PeriodPersent;
 uniform float Time;
 uniform int Pixel;
 
+uniform int InversedColor;
+
 out vec4 FragColor;
 
 mat4x3 Global = mat4x3(
@@ -110,7 +112,13 @@ vec4 GetColorGlobal(float it, mat4x3 pattern, vec3 col) {
 
     val = fract(val + 0.5);
 
-    return vec4(col + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])), 1.0);
+    vec3 newColor = vec3(col + pattern[1] * cos(6.28318 * (pattern[2] * val + pattern[3])));
+
+    if (InversedColor == 1) {
+        newColor = vec3(1.0f) - newColor;
+    }
+
+    return vec4(newColor, 1.0);
 }
 
 vec2 DoFunction(int num, vec2 z) {
