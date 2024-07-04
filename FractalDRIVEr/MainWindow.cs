@@ -258,6 +258,7 @@ namespace FractalDRIVEr
                 SmoothMode = false;
                 Barier = 4.0f;
                 InversedColor = false;
+                Pixel = 1;
             }
             if (KeyboardState.IsKeyDown(Keys.Left))
             {
